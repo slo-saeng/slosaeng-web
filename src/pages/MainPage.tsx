@@ -8,11 +8,12 @@ import Button from '../component/common/Button/Button';
 const MainPage = () => {
   const navigate = useNavigate();
   return (
-    <div className="px-40 py-20 space-y-10">
-      <div className="flex flex-col px-20 py-10 space-y-4 text-center border rounded-md place-items-center decoration-gray-400">
+    <div className="px-40 py-24 space-y-10">
+      <div className="flex flex-col px-20 py-8 space-y-4 text-center bg-white border rounded-md place-items-center decoration-gray-400">
         <p>
-          도움을 받을 수 있는 고령자부터,
-          <br /> 도움을 줄 수 있는 의료 종사자까지
+          도움을 받을 수 있는 <span className="underline">고령자</span>부터,
+          <br /> 도움을 줄 수 있는{' '}
+          <span className="underline">의료 종사자</span>까지
         </p>
         <Button text="로그인 하러 가기" onClick={() => navigate('/login')} />
         <Link className="text-sm hover:underline" to="/signUp">
