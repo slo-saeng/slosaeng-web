@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         'main-point': '#FCBA69',
         'main-base': '#FFF5E8',
+        'main-point-dark': '#FF9A1E',
       },
     },
   },
