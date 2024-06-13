@@ -30,6 +30,10 @@ module.exports = {
     },
   },
   rules: {
+    "prettier/prettier": [
+      "error",
+      { endOfLine: "auto" }
+    ],
     'react/react-in-jsx-scope': 'off',
     'import/no-extraneous-dependencies': 0,
     'react/function-component-definition': [
