@@ -1,131 +1,270 @@
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { FaHospital, FaUser, FaUserMd } from 'react-icons/fa';
 import ButtonCardWithClick from '../component/signup/ButtonCardWithClick/ButtonCardWithClick';
 import Button from '../component/common/Button/Button';
 
-const HospitalForm = () => (
-  <div className="space-y-3 w-3/4">
-    <input
-      type="text"
-      placeholder="아이디"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <input
-      type="password"
-      placeholder="비밀번호"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <input
-      type="text"
-      placeholder="병원이름"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <input
-      type="text"
-      placeholder="요양기관번호(의료기관코드)"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <p className="text-lg">
-      관련 서류는 메일에 첨부해주세요. (slosaeng@gmail.com)
-    </p>
-  </div>
-);
+const HospitalForm = () => {
+  const [formValues, setFormValues] = useState({
+    id: '',
+    password: '',
+    hospitalName: '',
+    institutionNumber: '',
+  });
 
-const DoctorForm = () => (
-  <div className="space-y-3 w-3/4">
-    <input
-      type="text"
-      placeholder="아이디"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <input
-      type="password"
-      placeholder="비밀번호"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <div className="flex">
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  return (
+    <div className="space-y-3 w-3/4">
       <input
         type="text"
-        placeholder="주민번호"
+        name="id"
+        value={formValues.id}
+        onChange={handleChange}
+        placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <p className="text-xl px-4 py-3 mt-2">ㅡ</p>
       <input
         type="password"
-        placeholder=""
+        name="password"
+        value={formValues.password}
+        onChange={handleChange}
+        placeholder="비밀번호"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-    </div>
-    <input
-      type="text"
-      placeholder="연락처"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <input
-      type="text"
-      placeholder="소속병원명"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <div className="mt-2 py-10">
-      <p>약관동의</p>
-      <textarea
-        placeholder="약관 동의 내용을 입력하세요."
-        rows={5}
-        className="block w-full px-3 py-2 mt-2 border rounded focus:border-blue-500 focus:outline-none"
-      />
-      <input type="checkbox" className="mr-2" />
-    </div>
-    <div className="pt-5">
-      <Button className="py-4 text-black" text="회원가입하기" />
-    </div>
-  </div>
-);
-
-const GuardianForm = () => (
-  <div className="space-y-3 w-3/4">
-    <input
-      type="text"
-      placeholder="아이디"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <input
-      type="password"
-      placeholder="비밀번호"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <div className="flex">
       <input
         type="text"
-        placeholder="주민번호"
+        name="hospitalName"
+        value={formValues.hospitalName}
+        onChange={handleChange}
+        placeholder="병원이름"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <p className="text-xl px-4 py-3 mt-2">ㅡ</p>
+      <input
+        type="text"
+        name="institutionNumber"
+        value={formValues.institutionNumber}
+        onChange={handleChange}
+        placeholder="요양기관번호(의료기관코드)"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <p className="text-lg">
+        관련 서류는 메일에 첨부해주세요. (slosaeng@gmail.com)
+      </p>
+      <div className="pt-5">
+        <Button className="py-4 text-black" text="회원가입하기" />
+      </div>
+    </div>
+  );
+};
+
+const DoctorForm = () => {
+  const [formValues, setFormValues] = useState({
+    id: '',
+    password: '',
+    ssnFront: '',
+    ssnBack: '',
+    contact: '',
+    hospitalName: '',
+    agreement: '',
+    agreed: false,
+  });
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleCheckboxChange = () => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      agreed: !prevValues.agreed,
+    }));
+  };
+
+  return (
+    <div className="space-y-3 w-3/4">
+      <input
+        type="text"
+        name="id"
+        value={formValues.id}
+        onChange={handleChange}
+        placeholder="아이디"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
       <input
         type="password"
-        placeholder=""
+        name="password"
+        value={formValues.password}
+        onChange={handleChange}
+        placeholder="비밀번호"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-    </div>
-    <input
-      type="text"
-      placeholder="연락처"
-      className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-    />
-    <div className="mt-2 py-10">
-      <p>약관동의</p>
-      <textarea
-        placeholder="약관 동의 내용을 입력하세요."
-        rows={5}
-        className="block w-full px-3 py-2 mt-2 border rounded focus:border-blue-500 focus:outline-none"
+      <div className="flex">
+        <input
+          type="text"
+          name="ssnFront"
+          value={formValues.ssnFront}
+          onChange={handleChange}
+          placeholder="주민번호"
+          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+        />
+        <p className="text-xl px-4 py-3 mt-2">ㅡ</p>
+        <input
+          type="password"
+          name="ssnBack"
+          value={formValues.ssnBack}
+          onChange={handleChange}
+          placeholder=""
+          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+        />
+      </div>
+      <input
+        type="text"
+        name="contact"
+        value={formValues.contact}
+        onChange={handleChange}
+        placeholder="연락처"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <input type="checkbox" className="mr-2" />
+      <input
+        type="text"
+        name="hospitalName"
+        value={formValues.hospitalName}
+        onChange={handleChange}
+        placeholder="소속병원명"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <div className="mt-2 py-10">
+        <p>약관동의</p>
+        <textarea
+          name="agreement"
+          value={formValues.agreement}
+          onChange={handleChange}
+          placeholder="약관 동의 내용을 입력하세요."
+          rows={5}
+          className="block w-full px-3 py-2 mt-2 border rounded focus:border-blue-500 focus:outline-none"
+        />
+        <input
+          type="checkbox"
+          checked={formValues.agreed}
+          onChange={handleCheckboxChange}
+          className="mr-2"
+        />
+      </div>
+      <div className="pt-5">
+        <Button className="py-4 text-black" text="회원가입하기" />
+      </div>
     </div>
+  );
+};
 
-    <div className="pt-5">
-      <Button className="py-4 text-black" text="회원가입하기" />
+const GuardianForm = () => {
+  const [formValues, setFormValues] = useState({
+    id: '',
+    password: '',
+    ssnFront: '',
+    ssnBack: '',
+    contact: '',
+    agreement: '',
+    agreed: false,
+  });
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleCheckboxChange = () => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      agreed: !prevValues.agreed,
+    }));
+  };
+
+  return (
+    <div className="space-y-3 w-3/4">
+      <input
+        type="text"
+        name="id"
+        value={formValues.id}
+        onChange={handleChange}
+        placeholder="아이디"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <input
+        type="password"
+        name="password"
+        value={formValues.password}
+        onChange={handleChange}
+        placeholder="비밀번호"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <div className="flex">
+        <input
+          type="text"
+          name="ssnFront"
+          value={formValues.ssnFront}
+          onChange={handleChange}
+          placeholder="주민번호"
+          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+        />
+        <p className="text-xl px-4 py-3 mt-2">ㅡ</p>
+        <input
+          type="password"
+          name="ssnBack"
+          value={formValues.ssnBack}
+          onChange={handleChange}
+          placeholder=""
+          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+        />
+      </div>
+      <input
+        type="text"
+        name="contact"
+        value={formValues.contact}
+        onChange={handleChange}
+        placeholder="연락처"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <div className="mt-2 py-10">
+        <p>약관동의</p>
+        <textarea
+          name="agreement"
+          value={formValues.agreement}
+          onChange={handleChange}
+          placeholder="약관 동의 내용을 입력하세요."
+          rows={5}
+          className="block w-full px-3 py-2 mt-2 border rounded focus:border-blue-500 focus:outline-none"
+        />
+        <input
+          type="checkbox"
+          checked={formValues.agreed}
+          onChange={handleCheckboxChange}
+          className="mr-2"
+        />
+      </div>
+      <div className="pt-5">
+        <Button className="py-4 text-black" text="회원가입하기" />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const SignUpPage = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
