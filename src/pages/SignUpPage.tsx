@@ -1,7 +1,60 @@
-import { useState, ChangeEvent } from 'react';
-import { FaHospital, FaUser, FaUserMd } from 'react-icons/fa';
+import { useState, ChangeEvent, KeyboardEvent } from 'react';
+import {
+  FaHospital,
+  FaUser,
+  FaUserMd,
+  FaEye,
+  FaEyeSlash,
+} from 'react-icons/fa';
 import ButtonCardWithClick from '../component/signup/ButtonCardWithClick/ButtonCardWithClick';
 import Button from '../component/common/Button/Button';
+
+const PasswordInput = ({
+  value,
+  onChange,
+  placeholder,
+  name,
+}: {
+  value: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  name: string;
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleKeyPress = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      togglePasswordVisibility();
+    }
+  };
+
+  return (
+    <div className="relative">
+      <input
+        type={showPassword ? 'text' : 'password'}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <div
+        className="absolute inset-y-0 right-2 flex items-center px-3 cursor-pointer text-gray-500"
+        onClick={togglePasswordVisibility}
+        onKeyPress={handleKeyPress}
+        tabIndex={0}
+        role="button"
+        aria-label="Toggle password visibility"
+      >
+        {showPassword ? <FaEyeSlash /> : <FaEye />}
+      </div>
+    </div>
+  );
+};
 
 const HospitalForm = () => {
   const [formValues, setFormValues] = useState({
@@ -29,13 +82,11 @@ const HospitalForm = () => {
         placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <input
-        type="password"
+      <PasswordInput
         name="password"
         value={formValues.password}
         onChange={handleChange}
         placeholder="비밀번호"
-        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
       <input
         type="text"
@@ -102,13 +153,11 @@ const DoctorForm = () => {
         placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <input
-        type="password"
+      <PasswordInput
         name="password"
         value={formValues.password}
         onChange={handleChange}
         placeholder="비밀번호"
-        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
       <div className="flex">
         <input
@@ -117,15 +166,6 @@ const DoctorForm = () => {
           value={formValues.ssnFront}
           onChange={handleChange}
           placeholder="주민번호"
-          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-        />
-        <p className="text-xl px-4 py-3 mt-2">ㅡ</p>
-        <input
-          type="password"
-          name="ssnBack"
-          value={formValues.ssnBack}
-          onChange={handleChange}
-          placeholder=""
           className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
         />
       </div>
@@ -207,13 +247,11 @@ const GuardianForm = () => {
         placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <input
-        type="password"
+      <PasswordInput
         name="password"
         value={formValues.password}
         onChange={handleChange}
         placeholder="비밀번호"
-        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
       <div className="flex">
         <input
@@ -222,15 +260,6 @@ const GuardianForm = () => {
           value={formValues.ssnFront}
           onChange={handleChange}
           placeholder="주민번호"
-          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-        />
-        <p className="text-xl px-4 py-3 mt-2">ㅡ</p>
-        <input
-          type="password"
-          name="ssnBack"
-          value={formValues.ssnBack}
-          onChange={handleChange}
-          placeholder=""
           className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
         />
       </div>
