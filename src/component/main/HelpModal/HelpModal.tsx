@@ -10,7 +10,6 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
   const [elder, setElder] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [request, setRequest] = useState<boolean>(false);
-  const [fill, setFill] = useState<boolean>(false);
 
   const onChangeReason = (e: ChangeEvent<HTMLInputElement>) => {
     setReason(e.target.value);
@@ -19,14 +18,13 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
   const onClickRequest = () => {
     if (elder && reason) {
       setRequest(true);
-      setFill(true);
     }
   };
 
   return (
     <div className="fixed z-20 flex items-center justify-center w-full h-full align-middle bg-black bg-opacity-60">
       <div className="w-3/5 p-8 text-center bg-white rounded-md">
-        {request && fill ? (
+        {request ? (
           <div className="flex flex-col space-y-8">
             <p className="text-center break-words whitespace-normal">
               <span className="font-bold underline">{elder}</span>님에 대한 긴급
@@ -55,11 +53,9 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
               name="reason"
               onChange={onChangeReason}
             />
-            {!fill && (
-              <p className="text-sm text-red-500 text-start">
-                ⚠️ 모든 내용을 작성해주세요
-              </p>
-            )}
+            <p className="text-sm text-red-500 text-start">
+              ⚠️ 모든 내용을 작성해주세요
+            </p>
             <p className="font-bold">
               해당 고령자에 대한 긴급 서비스를 요청하시겠습니까?
             </p>
