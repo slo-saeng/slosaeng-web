@@ -29,7 +29,7 @@ const MainPage = () => {
         <ButtonCard
           icon={<CiPill size={72} color="white" />}
           text="주변 의료기관 확인하기"
-          onClick={() => navigate('/find')}
+          onClick={() => navigate('/hospital')}
         />
         <ButtonCard
           icon={<MdElderly size={72} color="white" />}
