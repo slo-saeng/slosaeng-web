@@ -64,12 +64,27 @@ const HospitalForm = () => {
     institutionNumber: '',
   });
 
+  const [isValidId, setIsValidId] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
+    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
+      value,
+    );
+
+    if (name === 'id') {
+      setIsValidId(isValid);
+    } else if (name === 'password') {
+      setIsValidPassword(isValid);
+    }
+
+    if (isValid || name === 'hospitalName' || name === 'institutionNumber') {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        [name]: value,
+      }));
+    }
   };
 
   return (
@@ -82,12 +97,18 @@ const HospitalForm = () => {
         placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
+      {!isValidId && (
+        <p className="text-red-500">아이디에 한글은 입력할 수 없습니다.</p>
+      )}
       <PasswordInput
         name="password"
         value={formValues.password}
         onChange={handleChange}
         placeholder="비밀번호"
       />
+      {!isValidPassword && (
+        <p className="text-red-500">비밀번호에 한글은 입력할 수 없습니다.</p>
+      )}
       <input
         type="text"
         name="hospitalName"
@@ -126,14 +147,29 @@ const DoctorForm = () => {
     agreed: false,
   });
 
+  const [isValidId, setIsValidId] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
+    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
+      value,
+    );
+
+    if (name === 'id') {
+      setIsValidId(isValid);
+    } else if (name === 'password') {
+      setIsValidPassword(isValid);
+    }
+
+    if (isValid || name === 'hospitalName') {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        [name]: value,
+      }));
+    }
   };
 
   const handleCheckboxChange = () => {
@@ -153,15 +189,21 @@ const DoctorForm = () => {
         placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
+      {!isValidId && (
+        <p className="text-red-500">아이디에 한글은 입력할 수 없습니다.</p>
+      )}
       <PasswordInput
         name="password"
         value={formValues.password}
         onChange={handleChange}
         placeholder="비밀번호"
       />
+      {!isValidPassword && (
+        <p className="text-red-500">비밀번호에 한글은 입력할 수 없습니다.</p>
+      )}
       <div className="flex">
         <input
-          type="text"
+          type="number"
           name="ssnFront"
           value={formValues.ssnFront}
           onChange={handleChange}
@@ -170,7 +212,7 @@ const DoctorForm = () => {
         />
       </div>
       <input
-        type="text"
+        type="number"
         name="contact"
         value={formValues.contact}
         onChange={handleChange}
@@ -185,7 +227,7 @@ const DoctorForm = () => {
         placeholder="소속병원명"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <div className="mt-2 py-10">
+      <div className="mt-2 py-4">
         <p>약관동의</p>
         <textarea
           name="agreement"
@@ -220,14 +262,29 @@ const GuardianForm = () => {
     agreed: false,
   });
 
+  const [isValidId, setIsValidId] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
+    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
+      value,
+    );
+
+    if (name === 'id') {
+      setIsValidId(isValid);
+    } else if (name === 'password') {
+      setIsValidPassword(isValid);
+    }
+
+    if (isValid) {
+      setFormValues((prevValues) => ({
+        ...prevValues,
+        [name]: value,
+      }));
+    }
   };
 
   const handleCheckboxChange = () => {
@@ -247,15 +304,21 @@ const GuardianForm = () => {
         placeholder="아이디"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
+      {!isValidId && (
+        <p className="text-red-500">아이디에 한글은 입력할 수 없습니다.</p>
+      )}
       <PasswordInput
         name="password"
         value={formValues.password}
         onChange={handleChange}
         placeholder="비밀번호"
       />
+      {!isValidPassword && (
+        <p className="text-red-500">비밀번호에 한글은 입력할 수 없습니다.</p>
+      )}
       <div className="flex">
         <input
-          type="text"
+          type="number"
           name="ssnFront"
           value={formValues.ssnFront}
           onChange={handleChange}
@@ -264,7 +327,7 @@ const GuardianForm = () => {
         />
       </div>
       <input
-        type="text"
+        type="number"
         name="contact"
         value={formValues.contact}
         onChange={handleChange}
