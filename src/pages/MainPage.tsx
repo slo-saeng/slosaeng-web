@@ -26,24 +26,21 @@ const MainPage = () => {
             회원가입
           </Link>
         </div>
-
-        <div className="grid grid-cols-3 gap-10">
-          <ButtonCard
-            icon={<FaAmbulance size={72} color="white" />}
-            text="긴급 도움 요청 서비스"
-            onClick={() => setOpenModal(true)}
-          />
-          <ButtonCard
-            icon={<CiPill size={72} color="white" />}
-            text="주변 의료기관 확인하기"
-            onClick={() => navigate('/find')}
-          />
-          <ButtonCard
-            icon={<MdElderly size={72} color="white" />}
-            text="고령자 등록하기"
-            onClick={() => navigate('/register')}
-          />
-        </div>
+      <div className="grid grid-cols-3 gap-10">
+        <ButtonCard
+          icon={<FaAmbulance size={72} color="white" />}
+          text="긴급 도움 요청 서비스"
+        />
+        <ButtonCard
+          icon={<CiPill size={72} color="white" />}
+          text="주변 의료기관 확인하기"
+          onClick={() => navigate('/hospital')}
+        />
+        <ButtonCard
+          icon={<MdElderly size={72} color="white" />}
+          text="고령자 등록하기"
+          onClick={() => navigate('/register')}
+        />
       </div>
     </>
   );
