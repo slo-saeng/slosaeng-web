@@ -24,7 +24,8 @@ const HospitalPage = () => {
   };
 
   return (
-    <div className="h-screen px-40 py-24 space-y-10">
+    <div className="h-screen px-40 py-24 space-y-8">
+      <h1 className="text-4xl font-bold">주변 의료기관 확인하기 🔎</h1>
       <div className="grid grid-cols-3 gap-2">
         <select
           id="nation"
