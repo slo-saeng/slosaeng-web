@@ -79,7 +79,7 @@ const HospitalPage = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr className="hover:bg-main-base">
               <th>1</th>
               <td>아주대학교 병원</td>
               <td>경기 수원시 영통구 월드컵로 164</td>
@@ -90,7 +90,7 @@ const HospitalPage = () => {
                 </Link>
               </td>
             </tr>
-            <tr>
+            <tr className="hover:bg-main-base">
               <th>2</th>
               <td>아주대학교 병원</td>
               <td>경기 수원시 영통구 월드컵로 164</td>
@@ -101,7 +101,7 @@ const HospitalPage = () => {
                 </Link>
               </td>
             </tr>
-            <tr>
+            <tr className="hover:bg-main-base">
               <th>3</th>
               <td>아주대학교 병원</td>
               <td>경기 수원시 영통구 월드컵로 164</td>
