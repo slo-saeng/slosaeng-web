@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react';
 import {
   FaHospital,
   FaUser,
@@ -66,6 +66,7 @@ const HospitalForm = () => {
 
   const [isValidId, setIsValidId] = useState(true);
   const [isValidPassword, setIsValidPassword] = useState(true);
+  const [isFormComplete, setIsFormComplete] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -85,6 +86,19 @@ const HospitalForm = () => {
         [name]: value,
       }));
     }
+  };
+  useEffect(() => {
+    const { id, password, hospitalName, institutionNumber } = formValues;
+    const isValidForm =
+      id !== '' &&
+      password !== '' &&
+      hospitalName !== '' &&
+      institutionNumber !== '';
+    setIsFormComplete(isValidForm);
+  }, [formValues]);
+
+  const handleSubmit = () => {
+    alert('회원가입이 완료되었습니다.');
   };
 
   return (
@@ -129,7 +143,19 @@ const HospitalForm = () => {
         관련 서류는 메일에 첨부해주세요. (slosaeng@gmail.com)
       </p>
       <div className="pt-5">
-        <Button className="py-4 text-black" text="회원가입하기" />
+        {!isFormComplete && (
+          <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
+        )}
+        <Button
+          className={`py-4 text-black w-full rounded-md focus:outline-none ${
+            isFormComplete
+              ? 'bg-main-point hover:bg-main-point-dark'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
+          text="회원가입하기"
+          onClick={handleSubmit}
+          disabled={!isFormComplete}
+        />
       </div>
     </div>
   );
@@ -149,6 +175,7 @@ const DoctorForm = () => {
 
   const [isValidId, setIsValidId] = useState(true);
   const [isValidPassword, setIsValidPassword] = useState(true);
+  const [isFormComplete, setIsFormComplete] = useState(false);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -172,11 +199,27 @@ const DoctorForm = () => {
     }
   };
 
+  useEffect(() => {
+    const { id, password, ssnFront, contact, hospitalName, agreed } =
+      formValues;
+    const isValidForm =
+      id !== '' &&
+      password !== '' &&
+      ssnFront !== '' &&
+      contact !== '' &&
+      hospitalName !== '' &&
+      agreed;
+    setIsFormComplete(isValidForm);
+  }, [formValues]);
   const handleCheckboxChange = () => {
     setFormValues((prevValues) => ({
       ...prevValues,
       agreed: !prevValues.agreed,
     }));
+  };
+
+  const handleSubmit = () => {
+    alert('회원가입이 완료되었습니다.');
   };
 
   return (
@@ -239,13 +282,26 @@ const DoctorForm = () => {
         />
         <input
           type="checkbox"
+          name="checked"
           checked={formValues.agreed}
           onChange={handleCheckboxChange}
           className="mr-2"
         />
       </div>
       <div className="pt-5">
-        <Button className="py-4 text-black" text="회원가입하기" />
+        {!isFormComplete && (
+          <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
+        )}
+        <Button
+          className={`py-4 text-black w-full rounded-md focus:outline-none ${
+            isFormComplete
+              ? 'bg-main-point hover:bg-main-point-dark'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
+          text="회원가입하기"
+          onClick={handleSubmit}
+          disabled={!isFormComplete}
+        />
       </div>
     </div>
   );
@@ -264,6 +320,7 @@ const GuardianForm = () => {
 
   const [isValidId, setIsValidId] = useState(true);
   const [isValidPassword, setIsValidPassword] = useState(true);
+  const [isFormComplete, setIsFormComplete] = useState(false);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -287,6 +344,16 @@ const GuardianForm = () => {
     }
   };
 
+  useEffect(() => {
+    const { id, password, ssnFront, contact, agreed } = formValues;
+    const isValidForm =
+      id !== '' &&
+      password !== '' &&
+      ssnFront !== '' &&
+      contact !== '' &&
+      agreed;
+    setIsFormComplete(isValidForm);
+  }, [formValues]);
   const handleCheckboxChange = () => {
     setFormValues((prevValues) => ({
       ...prevValues,
@@ -294,6 +361,9 @@ const GuardianForm = () => {
     }));
   };
 
+  const handleSubmit = () => {
+    alert('회원가입이 완료되었습니다.');
+  };
   return (
     <div className="space-y-3 w-3/4">
       <input
@@ -334,7 +404,7 @@ const GuardianForm = () => {
         placeholder="연락처"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <div className="mt-2 py-10">
+      <div className="mt-2 py-4">
         <p>약관동의</p>
         <textarea
           name="agreement"
@@ -352,7 +422,19 @@ const GuardianForm = () => {
         />
       </div>
       <div className="pt-5">
-        <Button className="py-4 text-black" text="회원가입하기" />
+        {!isFormComplete && (
+          <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
+        )}
+        <Button
+          className={`py-4 text-black w-full rounded-md focus:outline-none ${
+            isFormComplete
+              ? 'bg-main-point hover:bg-main-point-dark'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
+          text="회원가입하기"
+          onClick={handleSubmit}
+          disabled={!isFormComplete}
+        />
       </div>
     </div>
   );

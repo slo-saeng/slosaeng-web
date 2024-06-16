@@ -4,9 +4,10 @@ interface ButtonProps {
   text: string;
   className?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
-const Button = ({ text, className, onClick }: ButtonProps) => {
+const Button = ({ text, className, onClick, disabled }: ButtonProps) => {
   return (
     <button
       type="button"
@@ -15,6 +16,7 @@ const Button = ({ text, className, onClick }: ButtonProps) => {
         className,
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {text}
     </button>
@@ -24,6 +26,7 @@ const Button = ({ text, className, onClick }: ButtonProps) => {
 Button.defaultProps = {
   className: '',
   onClick: null,
+  disabled: false,
 };
 
 export default Button;
