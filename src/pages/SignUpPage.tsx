@@ -43,7 +43,7 @@ const PasswordInput = ({
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
       <div
-        className="absolute inset-y-0 right-2 flex items-center px-3 cursor-pointer text-gray-500"
+        className="absolute inset-y-0 right-2 flex items-center px-3 cursor-pointer text-gray-400"
         onClick={togglePasswordVisibility}
         onKeyPress={handleKeyPress}
         tabIndex={0}
@@ -288,7 +288,7 @@ const DoctorForm = () => {
           className="mr-2"
         />
       </div>
-      <div className="pt-5">
+      <div className="">
         {!isFormComplete && (
           <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
@@ -421,7 +421,7 @@ const GuardianForm = () => {
           className="mr-2"
         />
       </div>
-      <div className="pt-5">
+      <div className="">
         {!isFormComplete && (
           <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
@@ -460,7 +460,7 @@ const SignUpPage = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="py-40">
         <p className="flex font-bold text-5xl w-2/3 items-center justify-left px-32">
-          회원가입 페이지
+          회원가입
         </p>
         <div className="grid grid-cols-3 gap-10 transform scale-75 translate-x-0 transition-all duration-500'">
           <ButtonCardWithClick
