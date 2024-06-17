@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from 'react';
 import classNames from 'classnames';
 import Input from '../component/common/Input/Input';
 import addressList from '../mocks/addressList.json';
-import type { elderProfile } from '../types/elder';
+import type { elderProfile } from '../types/member';
 import {
   hyphensPhoneNumber,
   idNumberValidCheck,
