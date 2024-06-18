@@ -26,6 +26,7 @@ const MainPage = () => {
             회원가입
           </Link>
         </div>
+      </div>
       <div className="grid grid-cols-3 gap-10">
         <ButtonCard
           icon={<FaAmbulance size={72} color="white" />}
