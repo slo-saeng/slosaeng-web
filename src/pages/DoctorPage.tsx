@@ -19,6 +19,7 @@ const DoctorPage: React.FC = () => {
     '고령자관리' | '주요대상관리'
   >('고령자관리');
   const [showPopup, setShowPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [searchResults, setSearchResults] = useState<ElderlyData[]>([]);
   const [elderlyData, setElderlyData] = useState<ElderlyData[]>([
     {
@@ -87,6 +88,10 @@ const DoctorPage: React.FC = () => {
       grade: '심각',
     },
   ]);
+  const [selectedElderly, setSelectedElderly] = useState<ElderlyData | null>(
+    null,
+  );
+  const [deleteReason, setDeleteReason] = useState('');
 
   const getGradeStyle = (grade: Grade) => {
     switch (grade) {
@@ -117,7 +122,22 @@ const DoctorPage: React.FC = () => {
       setElderlyData(elderlyData.filter((t) => t.id !== target.id));
     }
   };
-
+  const handleDeleteClick = (target: ElderlyData) => {
+    setSelectedElderly(target);
+    setShowDeletePopup(true);
+  };
+  const handleConfirmDelete = () => {
+    if (selectedElderly && deleteReason.trim() !== '') {
+      const updatedMajorTargets = majorTargetsData.filter(
+        (t) => t.id !== selectedElderly.id,
+      );
+      setMajorTargetsData(updatedMajorTargets);
+      setShowDeletePopup(false);
+      setSelectedElderly(null);
+      setDeleteReason('');
+      setElderlyData([...elderlyData, selectedElderly]);
+    }
+  };
   const handleSearch = (searchTerm: string) => {
     setSearchResults(
       elderlyData.filter((elderly) => elderly.name.includes(searchTerm)),
@@ -234,7 +254,7 @@ const DoctorPage: React.FC = () => {
                       <button
                         type="button"
                         className="px-2 py-1 bg-red-500 text-white rounded"
-                        onClick={() => handleAddTarget(target)}
+                        onClick={() => handleDeleteClick(target)}
                       >
                         삭제
                       </button>
@@ -369,6 +389,77 @@ const DoctorPage: React.FC = () => {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+      {showDeletePopup && selectedElderly && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded shadow-lg w-1/2">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">주요대상 삭제</h2>
+              <button
+                type="button"
+                className="text-xl font-bold"
+                onClick={() => setShowDeletePopup(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="mb-4">
+              <table className="w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-100 text-left">
+                    <th className="border border-gray-300 px-4 py-2">이름</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      생년월일
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      전화번호
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      거주지역
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderly.name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderly.birth}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderly.bloodType}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderly.residence}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <input
+              type="text"
+              className="border border-gray-300 rounded px-3 py-1 w-full mb-4 h-32"
+              placeholder="삭제 이유를 입력하세요"
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+            />
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className={`px-4 py-2 rounded ${
+                  selectedElderly && deleteReason.trim() !== ''
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-300 text-black cursor-not-allowed opacity-50'
+                } hover:bg-red-400`}
+                onClick={handleConfirmDelete}
+                disabled={!selectedElderly || deleteReason.trim() === ''}
+              >
+                삭제
+              </button>
+            </div>
           </div>
         </div>
       )}
