@@ -19,6 +19,7 @@ const DoctorPage: React.FC = () => {
     '고령자관리' | '주요대상관리'
   >('고령자관리');
   const [showPopup, setShowPopup] = useState(false);
+  const [showAddPopup, setShowAddPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [searchResults, setSearchResults] = useState<ElderlyData[]>([]);
   const [elderlyData, setElderlyData] = useState<ElderlyData[]>([
@@ -91,7 +92,11 @@ const DoctorPage: React.FC = () => {
   const [selectedElderly, setSelectedElderly] = useState<ElderlyData | null>(
     null,
   );
+  const [selectedElderlyAdd, setSelectedElderlyAdd] =
+    useState<ElderlyData | null>(null);
   const [deleteReason, setDeleteReason] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState<Grade>('관심');
+  const [reasonInput, setReasonInput] = useState('');
 
   const getGradeStyle = (grade: Grade) => {
     switch (grade) {
@@ -106,22 +111,30 @@ const DoctorPage: React.FC = () => {
     }
   };
 
-  const handleAddTarget = (target: ElderlyData) => {
-    const existingTargetIndex = majorTargetsData.findIndex(
-      (t) => t.id === target.id,
-    );
+  const handleConfirmAdd = () => {
+    if (selectedElderlyAdd && reasonInput.trim() !== '') {
+      const updatedTarget = { ...selectedElderlyAdd, grade: selectedGrade };
+      const updatedMajorTargets = [...majorTargetsData, updatedTarget];
+      const updatedElderlyData = elderlyData.filter(
+        (t) => t.id !== selectedElderlyAdd.id,
+      );
 
-    if (existingTargetIndex !== -1) {
-      const updatedMajorTargets = [...majorTargetsData];
-      updatedMajorTargets.splice(existingTargetIndex, 1);
       setMajorTargetsData(updatedMajorTargets);
+      setElderlyData(updatedElderlyData);
 
-      setElderlyData([...elderlyData, target]);
+      setShowAddPopup(false);
+      setSelectedGrade('관심');
+      setReasonInput('');
+      setSelectedElderlyAdd(null);
     } else {
-      setMajorTargetsData([...majorTargetsData, target]);
-      setElderlyData(elderlyData.filter((t) => t.id !== target.id));
+      alert('사유를 입력해야 주요 관리 대상으로 추가할 수 있습니다.');
     }
   };
+  const handelAddClick = (target: ElderlyData) => {
+    setSelectedElderlyAdd(target);
+    setShowAddPopup(true);
+  };
+
   const handleDeleteClick = (target: ElderlyData) => {
     setSelectedElderly(target);
     setShowDeletePopup(true);
@@ -244,9 +257,7 @@ const DoctorPage: React.FC = () => {
                       {target.otherInfo}
                     </td>
                     <td
-                      className={`border border-gray-300 px-4 py-2 ${getGradeStyle(
-                        target.grade || '관심',
-                      )}`}
+                      className={`border border-gray-300 px-4 py-2 ${getGradeStyle(target.grade!)}`}
                     >
                       {target.grade}
                     </td>
@@ -361,7 +372,7 @@ const DoctorPage: React.FC = () => {
                         <button
                           type="button"
                           className="px-2 py-1 bg-red-500 text-white rounded"
-                          onClick={() => handleAddTarget(result)}
+                          onClick={() => handleDeleteClick(result)}
                         >
                           삭제
                         </button>
@@ -369,7 +380,7 @@ const DoctorPage: React.FC = () => {
                         <button
                           type="button"
                           className="px-2 py-1 bg-blue-500 text-white rounded"
-                          onClick={() => handleAddTarget(result)}
+                          onClick={() => handelAddClick(result)}
                         >
                           추가
                         </button>
@@ -389,6 +400,91 @@ const DoctorPage: React.FC = () => {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+      {showAddPopup && selectedElderlyAdd && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded shadow-lg w-1/2">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">주요대상 추가 사유</h2>
+              <button
+                type="button"
+                className="text-xl font-bold"
+                onClick={() => setShowAddPopup(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="mb-4">
+              <table className="w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-100 text-left">
+                    <th className="border border-gray-300 px-4 py-2">이름</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      생년월일
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      전화번호
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      거주지역
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderlyAdd.name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderlyAdd.birth}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderlyAdd.bloodType}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {selectedElderlyAdd.residence}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mb-4">
+              <p className="block text-sm font-medium text-gray-700 p-1">
+                등급
+              </p>
+              <select
+                id="gradeSelect"
+                value={selectedGrade}
+                onChange={(e) => setSelectedGrade(e.target.value as Grade)}
+                className="block border border-gray-300 rounded px-2 py-1"
+              >
+                <option value="관심">관심</option>
+                <option value="주의">주의</option>
+                <option value="심각">심각</option>
+              </select>
+              <p className="block text-sm font-medium text-gray-700 pt-4 p-1">
+                사유
+              </p>
+              <input
+                type="text"
+                id="reasonInput"
+                value={reasonInput}
+                onChange={(e) => setReasonInput(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1 w-full mb-4 h-32"
+                placeholder="사유를 입력하세요"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
+                onClick={handleConfirmAdd}
+              >
+                추가
+              </button>
+            </div>
           </div>
         </div>
       )}
