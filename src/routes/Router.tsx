@@ -5,6 +5,7 @@ import SignUpPage from '../pages/SignUpPage';
 import RegisterPage from '../pages/RegisterPage';
 import HospitalPage from '../pages/HospitalPage';
 import LoginPage from '../pages/LoginPage';
+import SuperPage from '../pages/SuperPage';
 
 const Router = () => {
   const router = createBrowserRouter([
