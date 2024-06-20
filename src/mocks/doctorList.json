@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "state": "approve",
+    "list": [
+      {
+        "id": "doc",
+        "password": "1234",
+        "name": "김정은",
+        "phone": "010-1111-5555",
+        "position": "전공의",
+        "birth": "031111"
+      },
+      {
+        "id": "doc2",
+        "password": "77",
+        "name": "이한음",
+        "position": "전공의",
+        "phone": "010-2212-2221",
+        "birth": "031111"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "state": "doctor",
+    "list": [
+      {
+        "id": "doc3",
+        "password": "1234",
+        "name": "최수인",
+        "phone": "010-4545-1111",
+        "position": "전공의",
+        "birth": "031212"
+      }
+    ]
+  }
+]

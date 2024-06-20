@@ -29,6 +29,7 @@ const MainPage = () => {
         <div className="grid grid-cols-3 gap-10">
           <ButtonCard
             icon={<FaAmbulance size={72} color="white" />}
+            onClick={() => setOpenModal(true)}
             text="긴급 도움 요청 서비스"
           />
           <ButtonCard

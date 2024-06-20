@@ -5,6 +5,8 @@ import SignUpPage from '../pages/SignUpPage';
 import RegisterPage from '../pages/RegisterPage';
 import HospitalPage from '../pages/HospitalPage';
 import LoginPage from '../pages/LoginPage';
+import SuperPage from '../pages/SuperPage';
+import MasterPage from '../pages/MasterPage';
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -35,6 +37,10 @@ const Router = () => {
         {
           path: '/super',
           element: <SuperPage />,
+        },
+        {
+          path: '/master',
+          element: <MasterPage />,
         },
       ],
     },
