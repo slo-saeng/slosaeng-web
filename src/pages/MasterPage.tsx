@@ -26,6 +26,14 @@ const MasterPage = () => {
     (data) => data.state === detail,
   );
 
+  const onClickApprove = () => {
+    alert('승인되었습니다.');
+  };
+
+  const onClickDelete = () => {
+    alert('삭제되었습니다.');
+  };
+
   return (
     <div className="flex">
       <Sidebar
@@ -62,10 +70,12 @@ const MasterPage = () => {
                     <Button
                       text="승인"
                       className="text-white bg-green-500 hover:bg-green-600"
+                      onClick={() => onClickApprove()}
                     />
                     <Button
                       text="삭제"
                       className="text-white bg-red-500 hover:bg-red-600"
+                      onClick={() => onClickDelete()}
                     />
                   </td>
                 ) : (
@@ -73,6 +83,7 @@ const MasterPage = () => {
                     <Button
                       text="삭제"
                       className="text-white bg-red-500 hover:bg-red-600"
+                      onClick={() => onClickDelete()}
                     />
                   </td>
                 )}
