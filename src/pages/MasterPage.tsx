@@ -73,7 +73,7 @@ const MasterPage = () => {
                       onClick={() => onClickApprove()}
                     />
                     <Button
-                      text="삭제"
+                      text="거절"
                       className="text-white bg-red-500 hover:bg-red-600"
                       onClick={() => onClickDelete()}
                     />
