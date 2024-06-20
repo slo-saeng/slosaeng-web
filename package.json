@@ -11,6 +11,8 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/react-icons": "^3.0.0",
+    "@types/react-query": "^1.2.9",
+    "axios": "^1.7.2",
     "classnames": "^2.5.1",
     "daisyui": "^4.12.2",
     "react": "^18.3.1",
