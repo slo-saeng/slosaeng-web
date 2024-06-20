@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Notification from '../component/doctor/Notification';
 
 type Grade = '관심' | '주의' | '심각';
 
@@ -559,6 +560,7 @@ const DoctorPage: React.FC = () => {
           </div>
         </div>
       )}
+      <Notification />
     </div>
   );
 };
