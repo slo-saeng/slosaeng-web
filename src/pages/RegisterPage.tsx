@@ -21,6 +21,7 @@ interface Address {
 }
 
 const defaultInfo = {
+  id: 0,
   name: '',
   idNumber: '',
   phone: '',
