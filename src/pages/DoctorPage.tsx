@@ -12,6 +12,7 @@ interface ElderlyData {
   residence: string;
   bloodType: string;
   otherInfo: string;
+  phone: string;
   grade?: Grade;
 }
 
@@ -33,6 +34,7 @@ const DoctorPage: React.FC = () => {
       residence: '서울시 강남구 ㅇㅇㅇ',
       bloodType: 'A',
       otherInfo: '고혈압',
+      phone: '010-1234-5678',
     },
     {
       id: 2,
@@ -43,6 +45,7 @@ const DoctorPage: React.FC = () => {
       residence: '경기도 고양시 ㅇㅇㅇ',
       bloodType: 'B',
       otherInfo: '당뇨',
+      phone: '010-1234-5678',
     },
     {
       id: 3,
@@ -53,6 +56,7 @@ const DoctorPage: React.FC = () => {
       residence: '부산시 해운대구 ㅇㅇㅇ',
       bloodType: 'O',
       otherInfo: '심장병',
+      phone: '010-1234-5678',
     },
   ]);
   const [majorTargetsData, setMajorTargetsData] = useState<ElderlyData[]>([
@@ -66,6 +70,7 @@ const DoctorPage: React.FC = () => {
       bloodType: 'A',
       otherInfo: '고혈압',
       grade: '관심',
+      phone: '010-1234-5678',
     },
     {
       id: 5,
@@ -77,6 +82,7 @@ const DoctorPage: React.FC = () => {
       bloodType: 'B',
       otherInfo: '당뇨',
       grade: '주의',
+      phone: '010-1234-5678',
     },
     {
       id: 6,
@@ -88,6 +94,7 @@ const DoctorPage: React.FC = () => {
       bloodType: 'O',
       otherInfo: '심장병',
       grade: '심각',
+      phone: '010-1234-5678',
     },
   ]);
   const [selectedElderly, setSelectedElderly] = useState<ElderlyData | null>(
@@ -358,7 +365,7 @@ const DoctorPage: React.FC = () => {
                       {result.birth}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {result.bloodType}
+                      {result.phone}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {result.residence}
@@ -442,7 +449,7 @@ const DoctorPage: React.FC = () => {
                       {selectedElderlyAdd.birth}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {selectedElderlyAdd.bloodType}
+                      {selectedElderlyAdd.phone}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {selectedElderlyAdd.residence}
@@ -527,7 +534,7 @@ const DoctorPage: React.FC = () => {
                       {selectedElderly.birth}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {selectedElderly.bloodType}
+                      {selectedElderly.phone}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {selectedElderly.residence}
