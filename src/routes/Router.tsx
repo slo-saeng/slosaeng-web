@@ -32,6 +32,10 @@ const Router = () => {
           path: '/login',
           element: <LoginPage />,
         },
+        {
+          path: '/super',
+          element: <SuperPage />,
+        },
       ],
     },
   ]);
