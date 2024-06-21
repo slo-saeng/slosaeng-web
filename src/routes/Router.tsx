@@ -8,7 +8,7 @@ import LoginPage from '../pages/LoginPage';
 import DoctorPage from '../pages/DoctorPage';
 import SuperPage from '../pages/SuperPage';
 import MasterPage from '../pages/MasterPage';
-        
+
 const Router = () => {
   const router = createBrowserRouter([
     {
