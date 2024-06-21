@@ -16,8 +16,16 @@ import {
   phoneValidCheck,
 } from '../utils/privacy';
 import { doctorProfile } from '../types/doctor';
+import { hospitalProfile } from '../types/hospital';
 
-const defaultInfo = {
+const defaultHospitalInfo = {
+  id: '',
+  password: '',
+  hospitalName: '',
+  institutionNumber: '',
+};
+
+const defaultDoctorInfo = {
   id: '',
   password: '',
   idNumber: '',
@@ -28,13 +36,11 @@ const defaultInfo = {
 };
 
 const HospitalForm = () => {
-  const [formValues, setFormValues] = useState({
-    id: '',
-    password: '',
-    hospitalName: '',
-    institutionNumber: '',
-  });
+  const [info, setInfo] = useState<hospitalProfile>(defaultHospitalInfo);
   const [showPassword, setShowPassword] = useState(false);
+  const [isValidId, setIsValidId] = useState(true);
+  const [isValidPassword, setIsValidPassword] = useState(true);
+  const [showError, setShowError] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -46,15 +52,12 @@ const HospitalForm = () => {
     }
   };
 
-  const [isValidId, setIsValidId] = useState(true);
-  const [isValidPassword, setIsValidPassword] = useState(true);
-  const [isFormComplete, setIsFormComplete] = useState(false);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
-      value,
-    );
+
+    const isValid = /^[^\u3131-\u314e\u314f-\u3163\uac00-\ud7a3]*$/.test(value);
 
     if (name === 'id') {
       setIsValidId(isValid);
@@ -62,25 +65,33 @@ const HospitalForm = () => {
       setIsValidPassword(isValid);
     }
 
-    if (isValid || name === 'hospitalName' || name === 'institutionNumber') {
-      setFormValues((prevValues) => ({
-        ...prevValues,
+    if (isValid || (name !== 'id' && name !== 'password')) {
+      setInfo((prevInfo) => ({
+        ...prevInfo,
         [name]: value,
       }));
     }
   };
-  useEffect(() => {
-    const { id, password, hospitalName, institutionNumber } = formValues;
-    const isValidForm =
-      id !== '' &&
-      password !== '' &&
-      hospitalName !== '' &&
-      institutionNumber !== '';
-    setIsFormComplete(isValidForm);
-  }, [formValues]);
 
-  const handleSubmit = () => {
-    alert('회원가입이 완료되었습니다.');
+  const isFormValid = () => {
+    return (
+      info.id &&
+      isValidId &&
+      info.password &&
+      isValidPassword &&
+      info.hospitalName &&
+      info.institutionNumber
+    );
+  };
+
+  const onClickSubmit = () => {
+    if (isFormValid()) {
+      alert('등록되었어요!');
+      setInfo(defaultHospitalInfo);
+      setShowError(false);
+    } else {
+      setShowError(true);
+    }
   };
 
   return (
@@ -88,7 +99,7 @@ const HospitalForm = () => {
       <Input
         placeholder="아이디"
         name="id"
-        value={formValues.id}
+        value={info.id}
         onChange={handleChange}
         label="아이디"
         option
@@ -101,7 +112,7 @@ const HospitalForm = () => {
           placeholder="비밀번호"
           name="password"
           type={showPassword ? 'text' : 'password'}
-          value={formValues.password}
+          value={info.password}
           onChange={handleChange}
           label="비밀번호"
           option
@@ -123,7 +134,7 @@ const HospitalForm = () => {
       <Input
         placeholder="병원 이름"
         name="hospitalName"
-        value={formValues.hospitalName}
+        value={info.hospitalName}
         onChange={handleChange}
         label="병원 이름"
         option
@@ -131,7 +142,7 @@ const HospitalForm = () => {
       <Input
         placeholder="요양기관번호(의료기관코드)"
         name="institutionNumber"
-        value={formValues.institutionNumber}
+        value={info.institutionNumber}
         onChange={handleChange}
         label="요양기관번호(의료기관코드)"
         option
@@ -140,18 +151,17 @@ const HospitalForm = () => {
         관련 서류는 메일에 첨부해주세요. (slosaeng@gmail.com)
       </p>
       <div className="pt-5">
-        {!isFormComplete && (
+        {showError && (
           <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
         <Button
           className={`py-4 text-black w-full rounded-md focus:outline-none ${
-            isFormComplete
+            isFormValid()
               ? 'bg-main-point hover:bg-main-point-dark'
               : 'bg-gray-300 cursor-not-allowed'
           }`}
           text="회원가입하기"
-          onClick={handleSubmit}
-          disabled={!isFormComplete}
+          onClick={onClickSubmit}
         />
       </div>
     </div>
@@ -159,7 +169,7 @@ const HospitalForm = () => {
 };
 
 const DoctorForm = () => {
-  const [info, setInfo] = useState<doctorProfile>(defaultInfo);
+  const [info, setInfo] = useState<doctorProfile>(defaultDoctorInfo);
   const [rawIdNumber, setRawIdNumber] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [isValidId, setIsValidId] = useState(true);
@@ -251,7 +261,7 @@ const DoctorForm = () => {
     if (isFormValid()) {
       info.idNumber = rawIdNumber;
       alert('등록되었어요!');
-      setInfo(defaultInfo);
+      setInfo(defaultDoctorInfo);
       setShowError(false);
     } else {
       setShowError(true);
