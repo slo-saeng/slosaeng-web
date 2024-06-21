@@ -39,7 +39,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="w-3/4 py-48 space-y-3 px-96">
+      <div className="w-3/4 py-48 mx-40 space-y-3">
         <div className="pb-4">
           <p className="pb-3 text-5xl font-bold">슬로생</p>
           <p className="text-2xl"> 슬기로운 노후 생활로 가는 한 걸음</p>
