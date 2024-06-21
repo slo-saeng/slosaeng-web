@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, KeyboardEvent, useEffect } from 'react';
+import { useState, ChangeEvent, KeyboardEvent } from 'react';
 import {
   FaHospital,
   FaUser,
@@ -17,6 +17,7 @@ import {
 } from '../utils/privacy';
 import { doctorProfile } from '../types/doctor';
 import { hospitalProfile } from '../types/hospital';
+import { guardianProfile } from '../types/guardian';
 
 const defaultHospitalInfo = {
   id: '',
@@ -31,6 +32,15 @@ const defaultDoctorInfo = {
   idNumber: '',
   phone: '',
   affiliatedHospital: '',
+  agreement: '',
+  agreed: false,
+};
+
+const defaultGuardianInfo = {
+  id: '',
+  password: '',
+  idNumber: '',
+  phone: '',
   agreement: '',
   agreed: false,
 };
@@ -269,7 +279,7 @@ const DoctorForm = () => {
   };
 
   return (
-    <div className="space-y-3 w-3/4">
+    <div className="space-y-4 w-3/4">
       <Input
         placeholder="아이디"
         name="id"
@@ -387,27 +397,29 @@ const DoctorForm = () => {
 };
 
 const GuardianForm = () => {
-  const [formValues, setFormValues] = useState({
-    id: '',
-    password: '',
-    ssnFront: '',
-    ssnBack: '',
-    contact: '',
-    agreement: '',
-    agreed: false,
-  });
-
+  const [info, setInfo] = useState<guardianProfile>(defaultGuardianInfo);
+  const [rawIdNumber, setRawIdNumber] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isValidId, setIsValidId] = useState(true);
   const [isValidPassword, setIsValidPassword] = useState(true);
-  const [isFormComplete, setIsFormComplete] = useState(false);
+  const [showError, setShowError] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleKeyPress = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      togglePasswordVisibility();
+    }
+  };
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
-      value,
-    );
+
+    const isValid = /^[^\u3131-\u314e\u314f-\u3163\uac00-\ud7a3]*$/.test(value);
 
     if (name === 'id') {
       setIsValidId(isValid);
@@ -415,99 +427,182 @@ const GuardianForm = () => {
       setIsValidPassword(isValid);
     }
 
-    if (isValid) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
+    if (isValid || (name !== 'id' && name !== 'password')) {
+      setInfo((prevInfo) => ({
+        ...prevInfo,
         [name]: value,
       }));
     }
   };
 
-  useEffect(() => {
-    const { id, password, ssnFront, contact, agreed } = formValues;
-    const isValidForm =
-      id !== '' &&
-      password !== '' &&
-      ssnFront !== '' &&
-      contact !== '' &&
-      agreed;
-    setIsFormComplete(isValidForm);
-  }, [formValues]);
+  const handleInfoChange = (
+    e: ChangeEvent<
+      | HTMLInputElement
+      | HTMLSelectElement
+      | HTMLButtonElement
+      | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === 'phone') {
+      setInfo((prevInfo) => ({
+        ...prevInfo,
+        [name]: hyphensPhoneNumber(value),
+      }));
+    } else setInfo((prevInfo) => ({ ...prevInfo, [name]: value }));
+  };
+
   const handleCheckboxChange = () => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      agreed: !prevValues.agreed,
+    setInfo((prevInfo) => ({
+      ...prevInfo,
+      agreed: !prevInfo.agreed,
+    }));
+  };
+  const handleIdNumber = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRawIdNumber(value);
+
+    setInfo((prevInfo) => ({
+      ...prevInfo,
+      [name]: maskingIdNumber(value),
     }));
   };
 
-  const handleSubmit = () => {
-    alert('회원가입이 완료되었습니다.');
+  const isFormValid = () => {
+    return (
+      info.id &&
+      isValidId &&
+      info.password &&
+      isValidPassword &&
+      info.idNumber &&
+      idNumberValidCheck(rawIdNumber) &&
+      info.phone &&
+      phoneValidCheck(info.phone) &&
+      info.agreement &&
+      info.agreed
+    );
   };
+
+  const onClickSubmit = () => {
+    if (isFormValid()) {
+      info.idNumber = rawIdNumber;
+      alert('등록되었어요!');
+      setInfo(defaultDoctorInfo);
+      setShowError(false);
+    } else {
+      setShowError(true);
+    }
+  };
+
   return (
-    <div className="space-y-3 w-3/4">
-      <input
-        type="text"
-        name="id"
-        value={formValues.id}
-        onChange={handleChange}
+    <div className="space-y-4 w-3/4">
+      <Input
         placeholder="아이디"
-        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+        name="id"
+        value={info.id}
+        onChange={handleChange}
+        label="아이디"
+        option
       />
       {!isValidId && (
         <p className="text-red-500">아이디에 한글은 입력할 수 없습니다.</p>
       )}
-
+      <div className="relative">
+        <Input
+          placeholder="비밀번호"
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          value={info.password}
+          onChange={handleChange}
+          label="비밀번호"
+          option
+        />
+        <div
+          className="absolute inset-y-0 right-2 flex items-center px-3 cursor-pointer text-gray-400 pt-6"
+          onClick={togglePasswordVisibility}
+          onKeyPress={handleKeyPress}
+          tabIndex={0}
+          role="button"
+          aria-label="Toggle password visibility"
+        >
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </div>
+      </div>
       {!isValidPassword && (
         <p className="text-red-500">비밀번호에 한글은 입력할 수 없습니다.</p>
       )}
-      <div className="flex">
-        <input
-          type="number"
-          name="ssnFront"
-          value={formValues.ssnFront}
-          onChange={handleChange}
-          placeholder="주민번호"
-          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-        />
+      <div>
+        <label className="text-sm" htmlFor="phoneNumber">
+          주민등록번호
+          <span className="text-red-500">*</span>
+          <input
+            id="idNumber"
+            name="idNumber"
+            placeholder="주민등록번호를 입력해주세요"
+            className="w-full p-2 mt-1 text-sm border rounded-md"
+            value={info.idNumber}
+            onChange={handleIdNumber}
+          />
+          {rawIdNumber && !idNumberValidCheck(rawIdNumber) && (
+            <p className="mt-1 text-sm text-red-500">
+              올바른 주민등록번호를 입력해주세요.
+            </p>
+          )}
+        </label>
       </div>
-      <input
-        type="number"
-        name="contact"
-        value={formValues.contact}
-        onChange={handleChange}
-        placeholder="연락처"
-        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-      />
-      <div className="mt-2 py-4">
-        <p>약관동의</p>
+      <div>
+        <label className="text-sm" htmlFor="phoneNumber">
+          전화번호
+          <span className="text-red-500">*</span>
+          <input
+            id="phone"
+            name="phone"
+            placeholder="연락처를 입력해주세요"
+            className="w-full p-2 mt-1 text-sm border rounded-md"
+            value={info.phone}
+            onChange={handleInfoChange}
+          />
+          {info.phone && !phoneValidCheck(info.phone) && (
+            <p className="mt-1 text-sm text-red-500">
+              올바른 전화번호를 입력해주세요.
+            </p>
+          )}
+        </label>
+      </div>
+      <div>
+        <div className="flex">
+          <p className="text-sm pr-2">약관동의</p>
+          <input
+            type="checkbox"
+            name="checked"
+            checked={info.agreed}
+            onChange={handleCheckboxChange}
+            className="mr-2"
+          />
+          <span className="text-red-500">*</span>
+        </div>
         <textarea
           name="agreement"
-          value={formValues.agreement}
-          onChange={handleChange}
+          value={info.agreement}
+          onChange={handleInfoChange}
           placeholder="약관 동의 내용을 입력하세요."
           rows={5}
           className="block w-full px-3 py-2 mt-2 border rounded focus:border-blue-500 focus:outline-none"
         />
-        <input
-          type="checkbox"
-          checked={formValues.agreed}
-          onChange={handleCheckboxChange}
-          className="mr-2"
-        />
       </div>
       <div className="">
-        {!isFormComplete && (
+        {showError && (
           <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
         <Button
           className={`py-4 text-black w-full rounded-md focus:outline-none ${
-            isFormComplete
+            isFormValid()
               ? 'bg-main-point hover:bg-main-point-dark'
               : 'bg-gray-300 cursor-not-allowed'
           }`}
           text="회원가입하기"
-          onClick={handleSubmit}
-          disabled={!isFormComplete}
+          onClick={onClickSubmit}
         />
       </div>
     </div>
