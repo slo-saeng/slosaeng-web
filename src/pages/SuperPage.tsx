@@ -93,12 +93,12 @@ const SuperPage = () => {
           <td>{data.position}</td>
         </>
       );
-    if ('code' in data)
+    if ('institutionNumber' in data)
       return (
         <>
           <td>{data.id}</td>
           <td>{data.name}</td>
-          <td>{data.code}</td>
+          <td>{data.institutionNumber}</td>
         </>
       );
     return (

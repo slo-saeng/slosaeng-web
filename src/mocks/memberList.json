@@ -53,7 +53,7 @@
         "id": "hospital",
         "password": "1234",
         "name": "아주대병원",
-        "code": "1140292"
+        "institutionNumber": "1140292"
       }
     ]
   },

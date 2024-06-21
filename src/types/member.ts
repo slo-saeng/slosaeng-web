@@ -35,5 +35,5 @@ export interface masterProfile {
   id: string;
   password: string;
   name: string;
-  code: string;
+  institutionNumber: string;
 }
