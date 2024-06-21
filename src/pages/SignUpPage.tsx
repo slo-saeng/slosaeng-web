@@ -15,9 +15,11 @@ import {
   maskingIdNumber,
   phoneValidCheck,
 } from '../utils/privacy';
-import { doctorProfile } from '../types/doctor';
-import { hospitalProfile } from '../types/hospital';
-import { guardianProfile } from '../types/guardian';
+import {
+  doctorProfile,
+  guardianProfile,
+  hospitalProfile,
+} from '../types/signup';
 
 const defaultHospitalInfo = {
   id: '',
