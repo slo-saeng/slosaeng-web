@@ -9,7 +9,8 @@
         "name": "김정은",
         "phone": "010-1111-5555",
         "position": "전공의",
-        "birth": "031111"
+        "birth": "031111",
+        "institutionNumber": "111"
       },
       {
         "id": "doc2",
@@ -17,7 +18,8 @@
         "name": "이한음",
         "position": "전공의",
         "phone": "010-2212-2221",
-        "birth": "031111"
+        "birth": "031111",
+        "institutionNumber": "111"
       }
     ]
   },
@@ -31,7 +33,8 @@
         "name": "최수인",
         "phone": "010-4545-1111",
         "position": "전공의",
-        "birth": "031212"
+        "birth": "031212",
+        "institutionNumber": "111"
       }
     ]
   }
