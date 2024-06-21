@@ -1,46 +1,38 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import Button from '../../common/Button/Button';
 import { PasswordInput } from '../PasswordInput/PasswordInput';
+import { forbiddenKorean } from '../../../utils/privacy';
+import type { masterProfile } from '../../../types/member';
 
 export const HospitalForm = () => {
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<masterProfile>({
     id: '',
     password: '',
-    hospitalName: '',
+    name: '',
     institutionNumber: '',
   });
-
-  const [isValidId, setIsValidId] = useState(true);
-  const [isValidPassword, setIsValidPassword] = useState(true);
-  const [isFormComplete, setIsFormComplete] = useState(false);
+  const [isValidId, setIsValidId] = useState<boolean>(true);
+  const [isValidPassword, setIsValidPassword] = useState<boolean>(true);
+  const [isFormComplete, setIsFormComplete] = useState<boolean>(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
-      value,
-    );
 
     if (name === 'id') {
-      setIsValidId(isValid);
+      setIsValidId(forbiddenKorean(value));
     } else if (name === 'password') {
-      setIsValidPassword(isValid);
+      setIsValidPassword(forbiddenKorean(value));
     }
-
-    if (isValid || name === 'hospitalName' || name === 'institutionNumber') {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        [name]: value,
-      }));
-    }
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
-    const { id, password, hospitalName, institutionNumber } = formValues;
+    const { id, password, name, institutionNumber } = formValues;
     const isValidForm =
-      id !== '' &&
-      password !== '' &&
-      hospitalName !== '' &&
-      institutionNumber !== '';
+      id !== '' && password !== '' && name !== '' && institutionNumber !== '';
     setIsFormComplete(isValidForm);
   }, [formValues]);
 
@@ -72,10 +64,10 @@ export const HospitalForm = () => {
       )}
       <input
         type="text"
-        name="hospitalName"
-        value={formValues.hospitalName}
+        name="name"
+        value={formValues.name}
         onChange={handleChange}
-        placeholder="병원이름"
+        placeholder="병원 이름"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
       <input
@@ -86,12 +78,10 @@ export const HospitalForm = () => {
         placeholder="요양기관번호(의료기관코드)"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <p className="text-lg">
-        관련 서류는 메일에 첨부해주세요. (slosaeng@gmail.com)
-      </p>
+      <p>관련 서류 제출은 문의 바랍니다.</p>
       <div className="pt-5">
         {!isFormComplete && (
-          <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
+          <p className="mb-2 text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
         <Button
           className={`py-4 text-black w-full rounded-md focus:outline-none ${
