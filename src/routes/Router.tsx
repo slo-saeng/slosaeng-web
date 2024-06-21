@@ -5,9 +5,10 @@ import SignUpPage from '../pages/SignUpPage';
 import RegisterPage from '../pages/RegisterPage';
 import HospitalPage from '../pages/HospitalPage';
 import LoginPage from '../pages/LoginPage';
+import DoctorPage from '../pages/DoctorPage';
 import SuperPage from '../pages/SuperPage';
 import MasterPage from '../pages/MasterPage';
-
+        
 const Router = () => {
   const router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ const Router = () => {
         {
           path: '/login',
           element: <LoginPage />,
+        },
+        {
+          path: '/doctor',
+          element: <DoctorPage />,
         },
         {
           path: '/super',
