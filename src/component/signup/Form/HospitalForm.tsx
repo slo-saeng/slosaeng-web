@@ -3,6 +3,7 @@ import Button from '../../common/Button/Button';
 import { PasswordInput } from '../PasswordInput/PasswordInput';
 import { forbiddenKorean } from '../../../utils/privacy';
 import type { masterProfile } from '../../../types/member';
+import { useMasterMutation } from '../../../hooks/useMasterMutation';
 
 export const HospitalForm = () => {
   const [formValues, setFormValues] = useState<masterProfile>({
@@ -14,6 +15,7 @@ export const HospitalForm = () => {
   const [isValidId, setIsValidId] = useState<boolean>(true);
   const [isValidPassword, setIsValidPassword] = useState<boolean>(true);
   const [isFormComplete, setIsFormComplete] = useState<boolean>(false);
+  const { masterMutate } = useMasterMutation();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,7 +39,8 @@ export const HospitalForm = () => {
   }, [formValues]);
 
   const handleSubmit = () => {
-    alert('회원가입이 완료되었습니다.');
+    const { id, password, institutionNumber, name } = formValues;
+    if (isFormComplete) masterMutate({ id, password, name, institutionNumber });
   };
 
   return (
