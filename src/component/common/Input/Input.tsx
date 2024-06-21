@@ -9,6 +9,7 @@ interface InputProps {
   option?: boolean;
   type?: string;
   className?: string;
+  value?: string;
 }
 
 const Input = ({
@@ -19,6 +20,7 @@ const Input = ({
   label = '',
   option = false,
   type = 'text',
+  value = '',
 }: InputProps) => {
   return (
     <div>
@@ -35,6 +37,7 @@ const Input = ({
         placeholder={placeholder}
         className={classNames('w-full border p-2 rounded-md mt-1', className)}
         onChange={onChange}
+        value={value}
       />
     </div>
   );
