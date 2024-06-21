@@ -1,60 +1,71 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { PasswordInput } from '../PasswordInput/PasswordInput';
 import Button from '../../common/Button/Button';
+import {
+  forbiddenKorean,
+  hyphensPhoneNumber,
+  idNumberValidCheck,
+  maskingIdNumber,
+} from '../../../utils/privacy';
+import type { helperProfile } from '../../../types/member';
 
 export const GuardianForm = () => {
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<helperProfile>({
     id: '',
     password: '',
-    ssnFront: '',
-    ssnBack: '',
-    contact: '',
-    agreement: '',
-    agreed: false,
+    idNumber: '',
+    phone: '',
+    name: '',
   });
+  const [agree, setAgree] = useState<boolean>(false);
+  const [isValidId, setIsValidId] = useState<boolean>(true);
+  const [isValidPassword, setIsValidPassword] = useState<boolean>(true);
+  const [isFormComplete, setIsFormComplete] = useState<boolean>(false);
+  const [rawIdNumber, setRawIdNumber] = useState<string>('');
 
-  const [isValidId, setIsValidId] = useState(true);
-  const [isValidPassword, setIsValidPassword] = useState(true);
-  const [isFormComplete, setIsFormComplete] = useState(false);
-
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const isValid = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/.test(
-      value,
-    );
 
-    if (name === 'id') {
-      setIsValidId(isValid);
-    } else if (name === 'password') {
-      setIsValidPassword(isValid);
-    }
-
-    if (isValid) {
-      setFormValues((prevValues) => ({
-        ...prevValues,
-        [name]: value,
+    if (name === 'phone') {
+      setFormValues((prevInfo) => ({
+        ...prevInfo,
+        [name]: hyphensPhoneNumber(value),
       }));
+      return;
     }
+    if (name === 'id') {
+      setIsValidId(forbiddenKorean(value));
+    } else if (name === 'password') {
+      setIsValidPassword(forbiddenKorean(value));
+    }
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
+  };
+
+  const handleIdNumber = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRawIdNumber(value);
+
+    setFormValues((prevInfo) => ({
+      ...prevInfo,
+      [name]: maskingIdNumber(value),
+    }));
   };
 
   useEffect(() => {
-    const { id, password, ssnFront, contact, agreed } = formValues;
+    const { id, password, idNumber, phone, name } = formValues;
     const isValidForm =
       id !== '' &&
       password !== '' &&
-      ssnFront !== '' &&
-      contact !== '' &&
-      agreed;
+      name !== '' &&
+      idNumber !== '' &&
+      phone !== '' &&
+      rawIdNumber !== '' &&
+      agree;
     setIsFormComplete(isValidForm);
-  }, [formValues]);
-  const handleCheckboxChange = () => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      agreed: !prevValues.agreed,
-    }));
-  };
+  }, [formValues, agree]);
 
   const handleSubmit = () => {
     alert('회원가입이 완료되었습니다.');
@@ -82,42 +93,50 @@ export const GuardianForm = () => {
       {!isValidPassword && (
         <p className="text-red-500">비밀번호에 한글은 입력할 수 없습니다.</p>
       )}
-      <div className="flex">
-        <input
-          type="number"
-          name="ssnFront"
-          value={formValues.ssnFront}
-          onChange={handleChange}
-          placeholder="주민번호"
-          className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
-        />
-      </div>
       <input
-        type="number"
-        name="contact"
-        value={formValues.contact}
+        type="text"
+        name="idNumber"
+        value={formValues.idNumber}
+        onChange={handleIdNumber}
+        placeholder="주민등록번호"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      {rawIdNumber && !idNumberValidCheck(rawIdNumber) && (
+        <p className="mt-1 text-sm text-red-500">
+          올바른 주민등록번호를 입력해주세요.
+        </p>
+      )}
+      <input
+        type="text"
+        name="name"
+        value={formValues.name}
+        onChange={handleChange}
+        placeholder="이름"
+        className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
+      />
+      <input
+        name="phone"
+        value={formValues.phone}
         onChange={handleChange}
         placeholder="연락처"
         className="block w-full px-4 py-4 mt-2 border rounded focus:outline-none"
       />
-      <div className="py-4 mt-2">
-        <p>약관동의</p>
-        <textarea
-          name="agreement"
-          value={formValues.agreement}
-          onChange={handleChange}
-          placeholder="약관 동의 내용을 입력하세요."
-          rows={5}
-          className="block w-full px-3 py-2 mt-2 border rounded focus:border-blue-500 focus:outline-none"
-        />
-        <input
-          type="checkbox"
-          checked={formValues.agreed}
-          onChange={handleCheckboxChange}
-          className="mr-2"
-        />
+      <div className="py-4 mt-2 space-y-2">
+        <p className="block w-full h-40 px-3 py-2 mt-2 text-sm text-gray-400 border rounded">
+          약관 안내
+        </p>
+        <div className="flex">
+          <input
+            type="checkbox"
+            name="checked"
+            checked={agree}
+            onChange={() => setAgree(!agree)}
+            className="mr-2"
+          />
+          <p>약관에 동의합니다.</p>
+        </div>
       </div>
-      <div className="">
+      <div>
         {!isFormComplete && (
           <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
