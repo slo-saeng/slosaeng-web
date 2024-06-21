@@ -1,5 +1,9 @@
 import { server } from './server';
-import type { doctorProfile, masterProfile } from '../types/member';
+import type {
+  doctorProfile,
+  helperProfile,
+  masterProfile,
+} from '../types/member';
 
 export const postDoctor = async ({
   id,
@@ -36,6 +40,26 @@ export const postMaster = async ({
     password,
     name,
     institutionNumber,
+  });
+  if (response.status !== 200) {
+    throw new Error('가입에 실패하였습니다.');
+  }
+  return response;
+};
+
+export const postHelper = async ({
+  id,
+  password,
+  name,
+  phone,
+  idNumber,
+}: helperProfile) => {
+  const response = await server.post(`/helper`, {
+    id,
+    password,
+    name,
+    phone,
+    idNumber,
   });
   if (response.status !== 200) {
     throw new Error('가입에 실패하였습니다.');

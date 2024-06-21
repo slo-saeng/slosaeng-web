@@ -8,6 +8,7 @@ import {
   maskingIdNumber,
 } from '../../../utils/privacy';
 import type { helperProfile } from '../../../types/member';
+import { useHelperMutation } from '../../../hooks/useHelperMutation';
 
 export const GuardianForm = () => {
   const [formValues, setFormValues] = useState<helperProfile>({
@@ -22,6 +23,7 @@ export const GuardianForm = () => {
   const [isValidPassword, setIsValidPassword] = useState<boolean>(true);
   const [isFormComplete, setIsFormComplete] = useState<boolean>(false);
   const [rawIdNumber, setRawIdNumber] = useState<string>('');
+  const { helperMutate } = useHelperMutation();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,7 +70,9 @@ export const GuardianForm = () => {
   }, [formValues, agree]);
 
   const handleSubmit = () => {
-    alert('회원가입이 완료되었습니다.');
+    const { id, password, phone, name } = formValues;
+    if (isFormComplete)
+      helperMutate({ id, password, idNumber: rawIdNumber, phone, name });
   };
 
   return (
