@@ -164,6 +164,7 @@ const DoctorForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isValidId, setIsValidId] = useState(true);
   const [isValidPassword, setIsValidPassword] = useState(true);
+  const [showError, setShowError] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -247,9 +248,14 @@ const DoctorForm = () => {
   };
 
   const onClickSubmit = () => {
-    info.idNumber = rawIdNumber;
-    alert('등록되었어요!');
-    setInfo(defaultInfo);
+    if (isFormValid()) {
+      info.idNumber = rawIdNumber;
+      alert('등록되었어요!');
+      setInfo(defaultInfo);
+      setShowError(false);
+    } else {
+      setShowError(true);
+    }
   };
 
   return (
@@ -357,14 +363,13 @@ const DoctorForm = () => {
         />
       </div>
       <div className="">
-        {!isFormValid && (
+        {showError && (
           <p className="text-red-500">필수 입력사항들을 입력해주세요.</p>
         )}
         <Button
           className={`py-4 text-black w-full rounded-md focus:outline-none ${isFormValid() ? 'bg-main-point hover:bg-main-point-dark' : 'bg-gray-300 cursor-not-allowed'}`}
           text="회원가입하기"
           onClick={onClickSubmit}
-          disabled={!isFormValid()}
         />
       </div>
     </div>
