@@ -23,3 +23,8 @@ export const phoneValidCheck = (phone: string) => {
     /^(01[016789]{1}|02|0[3-9]{1}[0-9]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
   return pattern.test(phone);
 };
+// 한글 입력을 검사합니다.
+export const forbiddenKorean = (text: string) => {
+  const pattern = /^[^\u3131-\u314e|\u314f-\u3163|\uac00-\ud7a3]*$/;
+  return pattern.test(text);
+};

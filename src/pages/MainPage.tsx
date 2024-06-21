@@ -14,7 +14,7 @@ const MainPage = () => {
   return (
     <>
       {openModal && <HelpModal closeModal={() => setOpenModal(false)} />}
-      <div className="px-40 py-24 space-y-10">
+      <div className="h-screen px-20 py-24 space-y-10">
         <div className="flex flex-col px-20 py-8 space-y-4 text-center bg-white border rounded-md place-items-center decoration-gray-400">
           <p>
             도움을 받을 수 있는 <span className="underline">고령자</span>부터,

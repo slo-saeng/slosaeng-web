@@ -26,13 +26,14 @@ export interface doctorProfile {
   password: string;
   name: string;
   phone: string;
-  position?: string;
+  position: string;
   birth: string;
+  institutionNumber: string;
 }
 
 export interface masterProfile {
   id: string;
   password: string;
   name: string;
-  code: string;
+  institutionNumber: string;
 }

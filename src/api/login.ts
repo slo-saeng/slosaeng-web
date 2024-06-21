@@ -4,7 +4,7 @@ import type { Login } from '../types/login';
 export const JWT_ACCESSTOKEN_EXPIRATION = 2 * 3600 * 1000;
 
 export const postLogin = async ({ id, password }: Login) => {
-  const response = await server.post(`login`, { id, password });
+  const response = await server.post(`/login`, { id, password });
   if (response.status !== 200) {
     throw new Error('로그인에 실패하였습니다.');
   }
