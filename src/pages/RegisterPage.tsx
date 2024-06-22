@@ -26,23 +26,23 @@ const defaultInfo = {
   idNumber: '',
   phone: '',
   gender: '',
-  bloodType: '',
-  nation: '',
-  city: '',
-  district: '',
+  bloodType: 'RH_PLUS_A',
+  nationId: 1,
+  cityId: 1,
+  districtId: 1,
   detailAddress: '',
   etc: '',
 };
 
 const bloodTypeList = [
-  { id: 1, type: 'rh+ A' },
-  { id: 2, type: 'rh- A' },
-  { id: 3, type: 'rh+ B' },
-  { id: 4, type: 'rh- B' },
-  { id: 5, type: 'rh+ O' },
-  { id: 6, type: 'rh- O' },
-  { id: 7, type: 'rh+ AB' },
-  { id: 8, type: 'rh+ AB' },
+  { id: 1, type: 'RH_PLUS_A' },
+  { id: 2, type: 'RH_MINUS_A' },
+  { id: 3, type: 'RH_PLUS_B' },
+  { id: 4, type: 'RH_MINUS_B' },
+  { id: 5, type: 'RH_PLUS_O' },
+  { id: 6, type: 'RH_MINUS_O' },
+  { id: 7, type: 'RH_PLUS_AB' },
+  { id: 8, type: 'RH_MINUS_AB' },
 ];
 
 const RegisterPage = () => {
