@@ -16,13 +16,14 @@ const items = [
 
 const DoctorPage = () => {
   const [detail, setDetail] = useState<string>('elder');
-  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
   const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [deleteReason, setDeleteReason] = useState<string>('');
+  const [reason, setReason] = useState<string>('');
   const [selectedElder, setSelectedElder] = useState<
     elderProfile | majorElderProfile | null
   >(null);
+  const [selectedGrade, setSelectedGrade] = useState<string>('관심');
   const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
 
   const handleManageTable = (role: string) => {
@@ -74,11 +75,56 @@ const DoctorPage = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const handlePopup = (open: boolean) => {
-    setShowPopup(open);
-    if (!open) {
+  const handleAddPopup = (
+    open: boolean,
+    elder: elderProfile | majorElderProfile | null,
+  ) => {
+    setShowAddPopup(open);
+    if (open && elder) {
+      setSelectedElder(elder);
+    } else {
+      setSelectedElder(null);
       setSearchQuery('');
+      setReason('');
+      setSelectedGrade('관심');
     }
+  };
+
+  const handleAddElder = () => {
+    if (!selectedElder) return;
+
+    if (!reason.trim()) {
+      alert('추가 사유를 입력해주세요.');
+      return;
+    }
+
+    const updatedList: RoleData[] = elderListData.map((roleData) => {
+      if (roleData.role === 'elder') {
+        return {
+          ...roleData,
+          list: roleData.list.filter((elder) => elder.id !== selectedElder.id),
+        };
+      }
+      return roleData;
+    });
+
+    const updatedMajorElderList: RoleData[] = updatedList.map((roleData) => {
+      if (roleData.role === 'majorElder') {
+        const updatedElder = { ...selectedElder, grade: selectedGrade };
+        return {
+          ...roleData,
+          list: [...roleData.list, updatedElder],
+        };
+      }
+      return roleData;
+    });
+
+    setElderListData(updatedMajorElderList);
+    setShowAddPopup(false);
+    setSearchQuery('');
+    setReason('');
+    setSelectedElder(null);
+    setSelectedGrade('관심');
   };
 
   const handleDeletePopup = (
@@ -91,7 +137,7 @@ const DoctorPage = () => {
     } else {
       setSelectedElder(null);
       setSearchQuery('');
-      setDeleteReason('');
+      setReason('');
     }
   };
 
@@ -109,7 +155,7 @@ const DoctorPage = () => {
   const handleDeleteElder = () => {
     if (!selectedElder) return;
 
-    if (!deleteReason.trim()) {
+    if (!reason.trim()) {
       alert('삭제 사유를 입력해주세요.');
       return;
     }
@@ -126,7 +172,6 @@ const DoctorPage = () => {
 
     const updatedElderList: RoleData[] = updatedList.map((roleData) => {
       if (roleData.role === 'elder') {
-        // 주요대상 고령자의 등급 정보 제거
         const updatedElder = { ...selectedElder, grade: undefined };
         return {
           ...roleData,
@@ -139,7 +184,7 @@ const DoctorPage = () => {
     setElderListData(updatedElderList);
     setShowDeletePopup(false);
     setSearchQuery('');
-    setDeleteReason('');
+    setReason('');
     setSelectedElder(null);
   };
 
@@ -194,6 +239,7 @@ const DoctorPage = () => {
         <td>{data.phone}</td>
         <td>{data.bloodType}</td>
         <td>{data.etc}</td>
+        <td> </td>
       </>
     );
   };
@@ -212,16 +258,7 @@ const DoctorPage = () => {
             {items.find((data) => data.id === detail)?.text}
           </h1>
           <div className="flex justify-end mb-4">
-            {detail === 'elder' && (
-              <button
-                type="button"
-                className="btn"
-                onClick={() => handlePopup(true)}
-              >
-                주요대상 추가
-              </button>
-            )}
-            {detail === 'majorElder' && (
+            {detail && (
               <input
                 type="text"
                 placeholder="검색"
@@ -244,6 +281,17 @@ const DoctorPage = () => {
               <tr className="hover:bg-main-base" key={data.id}>
                 <th>{index + 1}</th>
                 {renderBody(data)}
+                {detail === 'elder' && (
+                  <td>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => handleAddPopup(true, data)}
+                    >
+                      추가
+                    </button>
+                  </td>
+                )}
                 {detail === 'majorElder' && (
                   <td>
                     <button
@@ -261,7 +309,7 @@ const DoctorPage = () => {
         </table>
       </div>
 
-      {showPopup && (
+      {showAddPopup && selectedElder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-8 rounded shadow-lg w-1/2">
             <div className="flex justify-between items-center mb-4">
@@ -269,34 +317,43 @@ const DoctorPage = () => {
               <button
                 type="button"
                 className="text-xl font-bold"
-                onClick={() => handlePopup(false)}
+                onClick={() => handleAddPopup(false, null)}
               >
                 &times;
               </button>
             </div>
-            <input
-              type="text"
-              placeholder="이름 검색"
-              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
             <table className="table text-center">
               <thead>
-                <tr>
-                  <th> </th>
-                  {renderHeader()}
-                </tr>
+                <tr>{renderHeader()}</tr>
               </thead>
               <tbody>
-                {filteredElders?.map((data, index) => (
-                  <tr className="hover:bg-main-base" key={data.id}>
-                    <th>{index + 1}</th>
-                    {renderBody(data)}
-                  </tr>
-                ))}
+                <tr className="hover:bg-main-base">
+                  {renderBody(selectedElder)}
+                </tr>
               </tbody>
             </table>
+            <select
+              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              value={selectedGrade}
+              onChange={(e) => setSelectedGrade(e.target.value)}
+            >
+              <option value="관심">관심</option>
+              <option value="주의">주의</option>
+              <option value="심각">심각</option>
+            </select>
+            <textarea
+              placeholder="추가 사유를 입력해주세요."
+              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn w-full"
+              onClick={handleAddElder}
+            >
+              추가
+            </button>
           </div>
         </div>
       )}
@@ -328,8 +385,8 @@ const DoctorPage = () => {
             <textarea
               placeholder="삭제 사유를 입력해주세요."
               className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
-              value={deleteReason}
-              onChange={(e) => setDeleteReason(e.target.value)}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
             />
             <button
               type="button"
