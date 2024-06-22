@@ -1,6 +1,8 @@
 import { useState, ChangeEvent } from 'react';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
+import { useMember } from '../../../hooks/useMember';
+import { elderProfile } from '../../../types/member';
 
 interface HelpModalProps {
   closeModal: () => void;
@@ -10,6 +12,7 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
   const [elder, setElder] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [request, setRequest] = useState<boolean>(false);
+  const { data } = useMember();
 
   const onChangeReason = (e: ChangeEvent<HTMLInputElement>) => {
     setReason(e.target.value);
@@ -42,11 +45,13 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
               onChange={(e) => setElder(e.target.value)}
             >
               <option disabled>고령자를 선택해주세요</option>
-              <option value="김정은" selected>
-                김정은
-              </option>
-              <option value="이한음">이한음</option>
-              <option value="최수인">최수인</option>
+              {data?.data.elderIds.map(({ id, name }: elderProfile) => {
+                return (
+                  <option key={id} value={name}>
+                    {name}
+                  </option>
+                );
+              })}
             </select>
             <Input
               placeholder="사유를 간단히 입력해주세요"
