@@ -236,7 +236,7 @@ const DoctorPage = () => {
           </td>
           <td>{birthdate}</td>
           <td>
-            {data.nation} {data.city} {data.district} {data.detailAddress}
+            {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
           </td>
           <td>{data.phone}</td>
           <td>{data.bloodType}</td>
@@ -252,7 +252,7 @@ const DoctorPage = () => {
         </td>
         <td>{birthdate}</td>
         <td>
-          {data.nation} {data.city} {data.district} {data.detailAddress}
+          {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
         </td>
         <td>{data.phone}</td>
         <td>{data.bloodType}</td>
@@ -280,7 +280,7 @@ const DoctorPage = () => {
               <input
                 type="text"
                 placeholder="검색"
-                className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+                className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
                 value={searchQuery}
                 onChange={handleSearch}
               />
@@ -328,9 +328,9 @@ const DoctorPage = () => {
       </div>
 
       {showAddPopup && selectedElder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow-lg w-1/2 space-y-6">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-1/2 p-8 space-y-6 bg-white rounded shadow-lg">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">주요대상 추가</h2>
               <button
                 type="button"
@@ -351,7 +351,7 @@ const DoctorPage = () => {
               </tbody>
             </table>
             <select
-              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
               value={selectedGrade}
               onChange={(e) => setSelectedGrade(e.target.value)}
             >
@@ -361,13 +361,13 @@ const DoctorPage = () => {
             </select>
             <textarea
               placeholder="추가 사유를 입력해주세요."
-              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
             <button
               type="button"
-              className="btn w-full"
+              className="w-full btn"
               onClick={handleAddElder}
             >
               추가
@@ -377,9 +377,9 @@ const DoctorPage = () => {
       )}
 
       {showDeletePopup && selectedElder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow-lg w-1/2 space-y-6">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-1/2 p-8 space-y-6 bg-white rounded shadow-lg">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">주요대상 삭제</h2>
               <button
                 type="button"
@@ -402,13 +402,13 @@ const DoctorPage = () => {
             </table>
             <textarea
               placeholder="삭제 사유를 입력해주세요."
-              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
             <button
               type="button"
-              className="btn w-full"
+              className="w-full btn"
               onClick={handleDeleteElder}
             >
               삭제
