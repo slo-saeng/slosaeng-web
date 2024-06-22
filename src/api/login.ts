@@ -25,3 +25,11 @@ export const postAccessToken = async () => {
   }
   return response;
 };
+
+export const getMember = async () => {
+  const response = await server.get(`/member/current`);
+  if (response.status !== 200) {
+    throw new Error('로그인 중인 멤버 확인에 실패했습니다.');
+  }
+  return response.data;
+};
