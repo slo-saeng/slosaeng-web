@@ -210,6 +210,23 @@ const DoctorPage = () => {
 
   const renderBody = (data: elderProfile | majorElderProfile) => {
     const birthdate = extractBirthdate(data.idNumber);
+    let gradeColor = '';
+    if ('grade' in data) {
+      switch (data.grade) {
+        case '관심':
+          gradeColor = 'bg-green-200';
+          break;
+        case '주의':
+          gradeColor = 'bg-yellow-200';
+          break;
+        case '심각':
+          gradeColor = 'bg-red-200';
+          break;
+        default:
+          gradeColor = '';
+          break;
+      }
+    }
     if ('grade' in data) {
       return (
         <>
@@ -223,7 +240,7 @@ const DoctorPage = () => {
           <td>{data.phone}</td>
           <td>{data.bloodType}</td>
           <td>{data.etc}</td>
-          <td>{data.grade}</td>
+          <td className={gradeColor}>{data.grade}</td>
         </>
       );
     }
@@ -311,7 +328,7 @@ const DoctorPage = () => {
 
       {showAddPopup && selectedElder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow-lg w-1/2">
+          <div className="bg-white p-8 rounded shadow-lg w-1/2 space-y-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">주요대상 추가</h2>
               <button
@@ -360,7 +377,7 @@ const DoctorPage = () => {
 
       {showDeletePopup && selectedElder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow-lg w-1/2">
+          <div className="bg-white p-8 rounded shadow-lg w-1/2 space-y-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">주요대상 삭제</h2>
               <button
