@@ -36,7 +36,7 @@
     "role": "majorElder",
     "list": [
       {
-        "id": 1,
+        "id": 3,
         "name": "박고령",
         "idNumber": "980202-3333333",
         "phone": "010-1111-2222",
@@ -50,8 +50,36 @@
         "etc": ""
       },
       {
-        "id": 2,
+        "id": 4,
         "name": "장고령",
+        "idNumber": "030303-3333333",
+        "phone": "010-1111-2222",
+        "gender": "남성",
+        "bloodType": "rh+ A",
+        "nation": "경기도",
+        "city": "수원시",
+        "district": "장안구",
+        "grade": "주의",
+        "detailAddress": "",
+        "etc": ""
+      },
+      {
+        "id": 5,
+        "name": "한고령",
+        "idNumber": "030303-3333333",
+        "phone": "010-1111-2222",
+        "gender": "남성",
+        "bloodType": "rh+ A",
+        "nation": "경기도",
+        "city": "수원시",
+        "district": "장안구",
+        "grade": "주의",
+        "detailAddress": "",
+        "etc": ""
+      },
+      {
+        "id": 6,
+        "name": "심고령",
         "idNumber": "030303-3333333",
         "phone": "010-1111-2222",
         "gender": "남성",

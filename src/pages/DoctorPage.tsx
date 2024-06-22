@@ -124,7 +124,19 @@ const DoctorPage = () => {
       return roleData;
     });
 
-    setElderListData(updatedList);
+    const updatedElderList: RoleData[] = updatedList.map((roleData) => {
+      if (roleData.role === 'elder') {
+        // 주요대상 고령자의 등급 정보 제거
+        const updatedElder = { ...selectedElder, grade: undefined };
+        return {
+          ...roleData,
+          list: [...roleData.list, updatedElder],
+        };
+      }
+      return roleData;
+    });
+
+    setElderListData(updatedElderList);
     setShowDeletePopup(false);
     setSearchQuery('');
     setDeleteReason('');
