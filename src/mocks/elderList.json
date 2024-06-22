@@ -38,7 +38,7 @@
       {
         "id": 1,
         "name": "박고령",
-        "idNumber": "020202-3333333",
+        "idNumber": "980202-3333333",
         "phone": "010-1111-2222",
         "gender": "남성",
         "bloodType": "rh+ A",
@@ -60,20 +60,6 @@
         "city": "수원시",
         "district": "장안구",
         "grade": "주의",
-        "detailAddress": "",
-        "etc": ""
-      },
-      {
-        "id": 3,
-        "name": "한고령",
-        "idNumber": "040404-3333333",
-        "phone": "010-1111-2222",
-        "gender": "남성",
-        "bloodType": "rh+ A",
-        "nation": "경기도",
-        "city": "수원시",
-        "district": "장안구",
-        "grade": "심각",
         "detailAddress": "",
         "etc": ""
       }

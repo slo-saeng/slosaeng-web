@@ -12,19 +12,8 @@ export interface elderProfile {
   etc?: string;
 }
 
-export interface majorElderProfile {
-  id: number;
-  name: string;
-  idNumber: string;
-  phone: string;
-  gender: string;
-  bloodType: string;
-  nation: string;
-  city: string;
-  district: string;
+export interface majorElderProfile extends elderProfile {
   grade: string;
-  detailAddress?: string;
-  etc?: string;
 }
 
 export interface helperProfile {

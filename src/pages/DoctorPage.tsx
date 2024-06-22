@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-// import Notification from '../component/doctor/Notification';
 import elderList from '../mocks/elderList.json';
 import { elderProfile, majorElderProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-// type Grade = '관심' | '주의' | '심각';
 
 interface RoleData {
   id: number;
   role: string;
-  list: elderProfile[] | majorElderProfile[];
+  list: (elderProfile | majorElderProfile)[];
 }
 
 const items = [
@@ -19,16 +17,23 @@ const items = [
 const DoctorPage = () => {
   const [detail, setDetail] = useState<string>('elder');
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  // const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
   const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [deleteReason, setDeleteReason] = useState<string>('');
+  const [selectedElder, setSelectedElder] = useState<
+    elderProfile | majorElderProfile | null
+  >(null);
+  const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
 
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
 
-  const tableData: RoleData | undefined = elderList.find(
-    (data) => data.role === detail,
+  const elderListDataFiltered = elderListData.filter(
+    (data) => data.role === 'elder',
+  );
+  const majorElderListDataFiltered = elderListData.filter(
+    (data) => data.role === 'majorElder',
   );
 
   const renderHeader = () => {
@@ -60,8 +65,9 @@ const DoctorPage = () => {
         return null;
     }
   };
+
   const extractBirthdate = (idNumber: string) => {
-    const yearPrefix = parseInt(idNumber[6], 10) <= 2 ? '19' : '20';
+    const yearPrefix = parseInt(idNumber[6], 10) <= 2 ? '20' : '19';
     const year = yearPrefix + idNumber.substring(0, 2);
     const month = idNumber.substring(2, 4);
     const day = idNumber.substring(4, 6);
@@ -75,24 +81,79 @@ const DoctorPage = () => {
     }
   };
 
-  const handleDeletePopup = (open: boolean) => {
+  const handleDeletePopup = (
+    open: boolean,
+    elder: elderProfile | majorElderProfile | null,
+  ) => {
     setShowDeletePopup(open);
-    if (!open) {
+    if (open && elder) {
+      setSelectedElder(elder);
+    } else {
+      setSelectedElder(null);
       setSearchQuery('');
+      setDeleteReason('');
     }
   };
 
-  const searchElderByName = (query: string) => {
-    return tableData?.list.filter((elder) => elder.name.includes(query.trim()));
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  const filteredElders = searchQuery
-    ? searchElderByName(searchQuery)
-    : tableData?.list;
+  const searchElderByName = (
+    query: string,
+    list: (elderProfile | majorElderProfile)[],
+  ) => {
+    return list.filter((elder) => elder.name.includes(query.trim()));
+  };
+
+  const handleDeleteElder = () => {
+    if (!selectedElder) return;
+
+    if (!deleteReason.trim()) {
+      alert('삭제 사유를 입력해주세요.');
+      return;
+    }
+
+    const updatedList: RoleData[] = elderListData.map((roleData) => {
+      if (roleData.role === 'majorElder') {
+        return {
+          ...roleData,
+          list: roleData.list.filter((elder) => elder.id !== selectedElder.id),
+        };
+      }
+      return roleData;
+    });
+
+    setElderListData(updatedList);
+    setShowDeletePopup(false);
+    setSearchQuery('');
+    setDeleteReason('');
+    setSelectedElder(null);
+  };
+
+  const getFilteredElders = () => {
+    if (searchQuery) {
+      if (detail === 'elder') {
+        return searchElderByName(searchQuery, elderListDataFiltered[0]?.list);
+      }
+      if (detail === 'majorElder') {
+        return searchElderByName(
+          searchQuery,
+          majorElderListDataFiltered[0]?.list,
+        );
+      }
+    }
+    if (detail === 'elder') return elderListDataFiltered[0]?.list;
+    if (detail === 'majorElder') return majorElderListDataFiltered[0]?.list;
+
+    return [];
+  };
+
+  const filteredElders = getFilteredElders();
 
   const renderBody = (data: elderProfile | majorElderProfile) => {
     const birthdate = extractBirthdate(data.idNumber);
-    if ('grade' in data)
+    if ('grade' in data) {
       return (
         <>
           <td>
@@ -108,6 +169,7 @@ const DoctorPage = () => {
           <td>{data.grade}</td>
         </>
       );
+    }
     return (
       <>
         <td>
@@ -148,13 +210,13 @@ const DoctorPage = () => {
               </button>
             )}
             {detail === 'majorElder' && (
-              <button
-                type="button"
-                className="btn"
-                onClick={() => handleDeletePopup(true)}
-              >
-                주요대상 삭제
-              </button>
+              <input
+                type="text"
+                placeholder="검색"
+                className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
             )}
           </div>
         </div>
@@ -166,10 +228,21 @@ const DoctorPage = () => {
             </tr>
           </thead>
           <tbody>
-            {tableData?.list.map((data, index) => (
+            {filteredElders?.map((data, index) => (
               <tr className="hover:bg-main-base" key={data.id}>
                 <th>{index + 1}</th>
                 {renderBody(data)}
+                {detail === 'majorElder' && (
+                  <td>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={() => handleDeletePopup(true, data)}
+                    >
+                      삭제
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -215,7 +288,8 @@ const DoctorPage = () => {
           </div>
         </div>
       )}
-      {showDeletePopup && (
+
+      {showDeletePopup && selectedElder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-8 rounded shadow-lg w-1/2">
             <div className="flex justify-between items-center mb-4">
@@ -223,38 +297,38 @@ const DoctorPage = () => {
               <button
                 type="button"
                 className="text-xl font-bold"
-                onClick={() => handleDeletePopup(false)}
+                onClick={() => handleDeletePopup(false, null)}
               >
-                &times;
+                ×
               </button>
             </div>
-            <input
-              type="text"
-              placeholder="이름 검색"
-              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+
             <table className="table text-center">
               <thead>
-                <tr>
-                  <th> </th>
-                  {renderHeader()}
-                </tr>
+                <tr>{renderHeader()}</tr>
               </thead>
               <tbody>
-                {filteredElders?.map((data, index) => (
-                  <tr className="hover:bg-main-base" key={data.id}>
-                    <th>{index + 1}</th>
-                    {renderBody(data)}
-                  </tr>
-                ))}
+                <tr className="hover:bg-main-base">
+                  {renderBody(selectedElder)}
+                </tr>
               </tbody>
             </table>
+            <textarea
+              placeholder="삭제 사유를 입력해주세요."
+              className="w-full px-4 py-2 border border-gray-300 rounded mb-4"
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn w-full"
+              onClick={handleDeleteElder}
+            >
+              삭제
+            </button>
           </div>
         </div>
       )}
-      {/* <Notification /> */}
     </div>
   );
 };
