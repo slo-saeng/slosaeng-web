@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import elderList from '../mocks/elderList.json';
 import { elderProfile, majorElderProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
+import Notification from '../component/doctor/Notification';
 
 interface RoleData {
   id: number;
@@ -415,6 +416,7 @@ const DoctorPage = () => {
           </div>
         </div>
       )}
+      <Notification />
     </div>
   );
 };

@@ -35,63 +35,47 @@ const SupportRequestPopup: React.FC<ElderlyData> = ({
   };
   return (
     <div className="fixed inset-0 bg-red-400 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded shadow-lg w-1/3">
+      <div className="bg-white p-6 rounded shadow-lg w-2/4 space-y-3">
         <h2 className="text-3xl font-bold mb-4">긴급 도움 요청 정보</h2>
-        <p className="mb-1 font-bold">도움 요청</p>
+        <p className="font-bold">도움 요청</p>
         <p className="mb-3 border px-3 py-2">{help.requestHelp}</p>
-        <p className="mb-1 font-bold">고령자정보</p>
-        <table className="table-auto w-full mb-4 ">
+        <p className="font-bold">고령자정보</p>
+        <table className="table-auto w-full mb-4 text-left">
+          <thead>
+            <tr className="text-sm">
+              <th className="border px-3  py-2">이름 / 나이 / 성별</th>
+              <th className="border px-3  py-2">혈액형</th>
+              <th className="border px-3  py-2">주소</th>
+              <th className="border px-3  py-2">전화번호</th>
+              {elderlyInfo.grade && (
+                <th className="border px-3  py-2">주요관리 등급</th>
+              )}
+              {!elderlyInfo.grade && (
+                <th className="border px-3  py-2">주요관리 대상</th>
+              )}
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <td className="border px-3 py-2 w-32 bg-gray-200 border-gray-300">
-                이름 / 나이
-              </td>
-              <td className="border px-3 py-2 border-gray-300">
+              <td className="border px-3 py-2">
                 {elderlyInfo.name} / {elderlyInfo.age} / {elderlyInfo.gender}
               </td>
-            </tr>
-            <tr>
-              <td className="border px-3 py-2 w-28 bg-gray-200 border-gray-300">
-                혈액형
-              </td>
-              <td className="border px-3 py-2 border-gray-300">
-                {elderlyInfo.bloodType}
-              </td>
-            </tr>
-            <tr>
-              <td className="border px-3 py-2 w-28 bg-gray-200 border-gray-300">
-                주소
-              </td>
-              <td className="border px-4 py-2 border-gray-300">
-                {elderlyInfo.residence}
-              </td>
-            </tr>
-            <tr>
-              <td className="border px-3 py-2 w-28 bg-gray-200 border-gray-300">
-                전화번호
-              </td>
-              <td className="border px-4 py-2 border-gray-300">
-                {elderlyInfo.phone}
-              </td>
-            </tr>
-            {elderlyInfo.grade && (
-              <tr>
-                <td className="border px-3 py-2 w-28 bg-gray-200 border-gray-300">
-                  주요관리 등급
-                </td>
+
+              <td className="border px-3 py-2">{elderlyInfo.bloodType}</td>
+
+              <td className="border px-4 py-2">{elderlyInfo.residence}</td>
+
+              <td className="border px-4 py-2">{elderlyInfo.phone}</td>
+
+              {elderlyInfo.grade && (
                 <td className="border px-4 py-2 border-gray-300">
                   {elderlyInfo.grade}
                 </td>
-              </tr>
-            )}
-            {!elderlyInfo.grade && (
-              <tr>
-                <td className="border px-3 py-2 w-28 bg-gray-200 border-gray-300">
-                  주요관리 대상
-                </td>
+              )}
+              {!elderlyInfo.grade && (
                 <td className="border px-4 py-2 border-gray-300">X</td>
-              </tr>
-            )}
+              )}
+            </tr>
           </tbody>
         </table>
         <div className="flex justify-end">
