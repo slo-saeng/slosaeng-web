@@ -12,6 +12,10 @@ export interface elderProfile {
   etc?: string;
 }
 
+export interface majorElderProfile extends elderProfile {
+  grade: string;
+}
+
 export interface helperProfile {
   id: string;
   password: string;
