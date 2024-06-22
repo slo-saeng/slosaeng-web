@@ -1,8 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import classNames from 'classnames';
 import Input from '../component/common/Input/Input';
-import addressList from '../mocks/addressList.json';
-import type { elderProfile } from '../types/member';
+import Button from '../component/common/Button/Button';
 import {
   hyphensPhoneNumber,
   idNumberValidCheck,
@@ -100,7 +99,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="py-24 space-y-4 px-96">
+    <div className="px-40 py-24 space-y-4">
       <h1 className="mb-12 text-4xl font-bold">고령자 등록하기</h1>
       <div className="space-y-4">
         <Input
@@ -223,7 +222,7 @@ const RegisterPage = () => {
                 onChange={handleInfoChange}
               >
                 <option disabled selected>
-                  거주지
+                  도
                 </option>
                 {addressList.map(({ id, name }) => (
                   <option key={id} value={name}>
@@ -239,7 +238,7 @@ const RegisterPage = () => {
                 onChange={handleInfoChange}
               >
                 <option disabled selected>
-                  거주지
+                  시
                 </option>
                 {cityList?.city.map(({ id, name }) => (
                   <option key={id} value={name}>
@@ -262,7 +261,7 @@ const RegisterPage = () => {
           <Input
             name="detailAddress"
             onChange={handleInfoChange}
-            placeholder="(선택) 상세주소를 입력해주세요"
+            placeholder="상세주소를 입력해주세요"
           />
         </div>
         <div className="flex flex-col space-y-2">
@@ -281,14 +280,11 @@ const RegisterPage = () => {
       {!fill && (
         <p className="text-sm text-red-500">필수 요소들을 전부 입력해주세요</p>
       )}
-      {/* 버튼 컴포넌트로 대체 예정 */}
-      <button
-        type="button"
-        className="w-full py-3 text-sm text-center rounded-md bg-main-point hover:bg-main-point-dark"
+      <Button
+        text="고령자 등록하기"
+        className="text-sm text-center"
         onClick={onClickSubmit}
-      >
-        고령자 등록하기
-      </button>
+      />
     </div>
   );
 };
