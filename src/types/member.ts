@@ -1,14 +1,14 @@
 export interface elderProfile {
-  id: number;
+  id?: number;
   name: string;
   idNumber: string;
   phone: string;
   gender: string;
   bloodType: string;
-  nation: string;
-  city: string;
-  district: string;
-  detailAddress?: string;
+  nationId: number;
+  cityId?: number | null;
+  districtId: number;
+  detailAddress: string;
   etc?: string;
 }
 
