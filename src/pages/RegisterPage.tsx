@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import Input from '../component/common/Input/Input';
 import Button from '../component/common/Button/Button';
@@ -8,19 +8,15 @@ import {
   maskingIdNumber,
   phoneValidCheck,
 } from '../utils/privacy';
+import { useNation } from '../hooks/useNation';
+import { useCity } from '../hooks/useCity';
+import { useDistrictCity } from '../hooks/useDistrictCity';
+import { useElderMutation } from '../hooks/useElderMutation';
+import type { Region } from '../types/nation';
+import type { elderProfile } from '../types/member';
+import { useDistrictNation } from '../hooks/useDistrictNation';
 
-interface City {
-  id: number;
-  name: string;
-}
-interface Address {
-  id: number;
-  name: string;
-  city: City[];
-}
-
-const defaultInfo = {
-  id: 0,
+const defaultInfo: elderProfile = {
   name: '',
   idNumber: '',
   phone: '',
@@ -48,6 +44,24 @@ const RegisterPage = () => {
   const [info, setInfo] = useState<elderProfile>(defaultInfo);
   const [rawIdNumber, setRawIdNumber] = useState<string>('');
   const [fill, setFill] = useState<boolean>(true);
+  const { data: nationList } = useNation();
+  const { data: cityList } = useCity(info.nationId);
+  const { data: districtCityList } = useDistrictCity(
+    cityList?.data.length !== 0 ? info.cityId : null,
+  );
+  const { data: districtNationList } = useDistrictNation(info.nationId);
+  const [districtList, setDistrictList] = useState<Region[]>(
+    cityList?.data.length !== 0 ? districtCityList : districtNationList,
+  );
+  const { elderMutate } = useElderMutation();
+
+  useEffect(() => {
+    if (cityList?.data.length === 0) {
+      setDistrictList(districtNationList?.data || []);
+    } else {
+      setDistrictList(districtCityList?.data || []);
+    }
+  }, [cityList, districtNationList, districtCityList]);
 
   const handleInfoChange = (
     e: ChangeEvent<
@@ -58,12 +72,10 @@ const RegisterPage = () => {
     >,
   ) => {
     const { name, value } = e.target;
-    if (name === 'phone') {
-      setInfo((prevInfo) => ({
-        ...prevInfo,
-        [name]: hyphensPhoneNumber(value),
-      }));
-    } else setInfo((prevInfo) => ({ ...prevInfo, [name]: value }));
+    setInfo((prevInfo) => ({
+      ...prevInfo,
+      [name]: name === 'phone' ? hyphensPhoneNumber(value) : value,
+    }));
   };
 
   const handleIdNumber = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,26 +88,25 @@ const RegisterPage = () => {
     }));
   };
 
-  const cityList = addressList.find(
-    (address: Address) => address.name === info.nation,
-  );
-
   const onClickSubmit = () => {
-    if (
-      !info.name ||
-      !info.idNumber ||
-      !info.phone ||
-      !info.gender ||
-      !info.bloodType ||
-      !info.nation ||
-      !info.city
-    )
-      setFill(false);
-    else {
-      info.idNumber = rawIdNumber;
-      alert('등록되었어요!');
+    const isValid =
+      info.name &&
+      rawIdNumber &&
+      info.phone &&
+      info.gender &&
+      info.bloodType &&
+      info.nationId &&
+      info.cityId &&
+      info.detailAddress;
+
+    if (isValid) {
+      elderMutate({
+        ...info,
+        idNumber: rawIdNumber,
+        cityId: districtCityList ? info.cityId : null,
+      });
       setInfo(defaultInfo);
-    }
+    } else setFill(false);
   };
 
   return (
@@ -149,7 +160,6 @@ const RegisterPage = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col">
-            {/* api 연동 후 수정 예정 */}
             <label className="text-sm" htmlFor="bloodType">
               혈액형<span className="text-red-500 ">*</span>{' '}
             </label>
@@ -180,13 +190,13 @@ const RegisterPage = () => {
                 name="gender"
                 onClick={() =>
                   handleInfoChange({
-                    target: { name: 'gender', value: '남성' },
+                    target: { name: 'gender', value: 'MEN' },
                   } as ChangeEvent<HTMLButtonElement>)
                 }
                 type="button"
                 className={classNames(
                   'w-full py-2 text-gray-400 border rounded-md hover:bg-gray-100',
-                  { 'bg-gray-100 text-black': info.gender === '남성' },
+                  { 'bg-gray-100 text-black': info.gender === 'MEN' },
                 )}
               >
                 남
@@ -196,13 +206,13 @@ const RegisterPage = () => {
                 name="gender"
                 onClick={() =>
                   handleInfoChange({
-                    target: { name: 'gender', value: '여성' },
+                    target: { name: 'gender', value: 'WOMEN' },
                   } as ChangeEvent<HTMLButtonElement>)
                 }
                 type="button"
                 className={classNames(
                   'w-full py-2 text-gray-400 border rounded-md hover:bg-gray-100',
-                  { 'bg-gray-100 text-black': info.gender === '여성' },
+                  { 'bg-gray-100 text-black': info.gender === 'WOMEN' },
                 )}
               >
                 여
@@ -216,45 +226,51 @@ const RegisterPage = () => {
             <div className="grid grid-cols-3 gap-2" id="residence">
               <select
                 id="nation"
-                name="nation"
+                name="nationId"
                 className="p-2 mt-2 border rounded-md"
-                value={info.nation}
+                value={info.nationId}
                 onChange={handleInfoChange}
               >
                 <option disabled selected>
                   도
                 </option>
-                {addressList.map(({ id, name }) => (
-                  <option key={id} value={name}>
+                {nationList?.data.map(({ id, name }: Region) => (
+                  <option key={id} value={id}>
                     {name}
                   </option>
                 ))}
               </select>
               <select
                 id="city"
-                name="city"
+                name="cityId"
                 className="p-2 mt-2 border rounded-md"
-                value={info.city}
+                value={info.cityId || ''}
                 onChange={handleInfoChange}
               >
                 <option disabled selected>
                   시
                 </option>
-                {cityList?.city.map(({ id, name }) => (
-                  <option key={id} value={name}>
+                {cityList?.data.map(({ id, name }: Region) => (
+                  <option key={id} value={id}>
                     {name}
                   </option>
                 ))}
               </select>
               <select
                 id="district"
-                name="district"
+                name="districtId"
                 className="p-2 mt-2 border rounded-md"
-                value={info.district}
+                value={info.districtId}
                 onChange={handleInfoChange}
               >
-                <option selected>거주지</option>
-                {/* api 연동 후 처리 예정 */}
+                <option disabled selected>
+                  구
+                </option>
+                {districtList?.map(({ id, name }: Region) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
               </select>
             </div>{' '}
           </label>
