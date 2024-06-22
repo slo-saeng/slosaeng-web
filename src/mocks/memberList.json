@@ -68,9 +68,9 @@
         "phone": "919-1111-2222",
         "gender": "남성",
         "bloodType": "rh+ A",
-        "nation": "경기도",
-        "city": "수원시",
-        "district": "장안구",
+        "nationId": 1,
+        "cityId": 2,
+        "districtId": 3,
         "detailAddress": "",
         "etc": ""
       }

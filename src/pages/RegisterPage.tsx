@@ -1,54 +1,67 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import Input from '../component/common/Input/Input';
-import addressList from '../mocks/addressList.json';
-import type { elderProfile } from '../types/member';
+import Button from '../component/common/Button/Button';
 import {
   hyphensPhoneNumber,
   idNumberValidCheck,
   maskingIdNumber,
   phoneValidCheck,
 } from '../utils/privacy';
+import { useNation } from '../hooks/useNation';
+import { useCity } from '../hooks/useCity';
+import { useDistrictCity } from '../hooks/useDistrictCity';
+import { useElderMutation } from '../hooks/useElderMutation';
+import type { Region } from '../types/nation';
+import type { elderProfile } from '../types/member';
+import { useDistrictNation } from '../hooks/useDistrictNation';
 
-interface City {
-  id: number;
-  name: string;
-}
-interface Address {
-  id: number;
-  name: string;
-  city: City[];
-}
-
-const defaultInfo = {
-  id: 0,
+const defaultInfo: elderProfile = {
   name: '',
   idNumber: '',
   phone: '',
   gender: '',
-  bloodType: '',
-  nation: '',
-  city: '',
-  district: '',
+  bloodType: 'RH_PLUS_A',
+  nationId: 1,
+  cityId: 1,
+  districtId: 1,
   detailAddress: '',
   etc: '',
 };
 
 const bloodTypeList = [
-  { id: 1, type: 'rh+ A' },
-  { id: 2, type: 'rh- A' },
-  { id: 3, type: 'rh+ B' },
-  { id: 4, type: 'rh- B' },
-  { id: 5, type: 'rh+ O' },
-  { id: 6, type: 'rh- O' },
-  { id: 7, type: 'rh+ AB' },
-  { id: 8, type: 'rh+ AB' },
+  { id: 1, type: 'RH_PLUS_A' },
+  { id: 2, type: 'RH_MINUS_A' },
+  { id: 3, type: 'RH_PLUS_B' },
+  { id: 4, type: 'RH_MINUS_B' },
+  { id: 5, type: 'RH_PLUS_O' },
+  { id: 6, type: 'RH_MINUS_O' },
+  { id: 7, type: 'RH_PLUS_AB' },
+  { id: 8, type: 'RH_MINUS_AB' },
 ];
 
 const RegisterPage = () => {
   const [info, setInfo] = useState<elderProfile>(defaultInfo);
   const [rawIdNumber, setRawIdNumber] = useState<string>('');
   const [fill, setFill] = useState<boolean>(true);
+  const { data: nationList } = useNation();
+  const { data: cityList } = useCity(info.nationId);
+  const { data: districtCityList } = useDistrictCity(
+    cityList?.data.length !== 0 ? info.cityId : null,
+  );
+  const { data: districtNationList } = useDistrictNation(info.nationId);
+  const [districtList, setDistrictList] = useState<Region[]>(
+    cityList?.data.length !== 0 ? districtCityList : districtNationList,
+  );
+  const { elderMutate } = useElderMutation();
+
+  useEffect(() => {
+    if (cityList?.data.length === 0) {
+      setDistrictList(districtNationList?.data || []);
+    } else {
+      setDistrictList(districtCityList?.data || []);
+    }
+  }, [cityList, districtNationList, districtCityList]);
 
   const handleInfoChange = (
     e: ChangeEvent<
@@ -59,12 +72,10 @@ const RegisterPage = () => {
     >,
   ) => {
     const { name, value } = e.target;
-    if (name === 'phone') {
-      setInfo((prevInfo) => ({
-        ...prevInfo,
-        [name]: hyphensPhoneNumber(value),
-      }));
-    } else setInfo((prevInfo) => ({ ...prevInfo, [name]: value }));
+    setInfo((prevInfo) => ({
+      ...prevInfo,
+      [name]: name === 'phone' ? hyphensPhoneNumber(value) : value,
+    }));
   };
 
   const handleIdNumber = (e: ChangeEvent<HTMLInputElement>) => {
@@ -77,30 +88,29 @@ const RegisterPage = () => {
     }));
   };
 
-  const cityList = addressList.find(
-    (address: Address) => address.name === info.nation,
-  );
-
   const onClickSubmit = () => {
-    if (
-      !info.name ||
-      !info.idNumber ||
-      !info.phone ||
-      !info.gender ||
-      !info.bloodType ||
-      !info.nation ||
-      !info.city
-    )
-      setFill(false);
-    else {
-      info.idNumber = rawIdNumber;
-      alert('등록되었어요!');
+    const isValid =
+      info.name &&
+      rawIdNumber &&
+      info.phone &&
+      info.gender &&
+      info.bloodType &&
+      info.nationId &&
+      info.cityId &&
+      info.detailAddress;
+
+    if (isValid) {
+      elderMutate({
+        ...info,
+        idNumber: rawIdNumber,
+        cityId: districtCityList ? info.cityId : null,
+      });
       setInfo(defaultInfo);
-    }
+    } else setFill(false);
   };
 
   return (
-    <div className="py-24 space-y-4 px-96">
+    <div className="px-40 py-24 space-y-4">
       <h1 className="mb-12 text-4xl font-bold">고령자 등록하기</h1>
       <div className="space-y-4">
         <Input
@@ -150,7 +160,6 @@ const RegisterPage = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col">
-            {/* api 연동 후 수정 예정 */}
             <label className="text-sm" htmlFor="bloodType">
               혈액형<span className="text-red-500 ">*</span>{' '}
             </label>
@@ -181,13 +190,13 @@ const RegisterPage = () => {
                 name="gender"
                 onClick={() =>
                   handleInfoChange({
-                    target: { name: 'gender', value: '남성' },
+                    target: { name: 'gender', value: 'MEN' },
                   } as ChangeEvent<HTMLButtonElement>)
                 }
                 type="button"
                 className={classNames(
                   'w-full py-2 text-gray-400 border rounded-md hover:bg-gray-100',
-                  { 'bg-gray-100 text-black': info.gender === '남성' },
+                  { 'bg-gray-100 text-black': info.gender === 'MEN' },
                 )}
               >
                 남
@@ -197,13 +206,13 @@ const RegisterPage = () => {
                 name="gender"
                 onClick={() =>
                   handleInfoChange({
-                    target: { name: 'gender', value: '여성' },
+                    target: { name: 'gender', value: 'WOMEN' },
                   } as ChangeEvent<HTMLButtonElement>)
                 }
                 type="button"
                 className={classNames(
                   'w-full py-2 text-gray-400 border rounded-md hover:bg-gray-100',
-                  { 'bg-gray-100 text-black': info.gender === '여성' },
+                  { 'bg-gray-100 text-black': info.gender === 'WOMEN' },
                 )}
               >
                 여
@@ -217,52 +226,58 @@ const RegisterPage = () => {
             <div className="grid grid-cols-3 gap-2" id="residence">
               <select
                 id="nation"
-                name="nation"
+                name="nationId"
                 className="p-2 mt-2 border rounded-md"
-                value={info.nation}
+                value={info.nationId}
                 onChange={handleInfoChange}
               >
                 <option disabled selected>
-                  거주지
+                  도
                 </option>
-                {addressList.map(({ id, name }) => (
-                  <option key={id} value={name}>
+                {nationList?.data.map(({ id, name }: Region) => (
+                  <option key={id} value={id}>
                     {name}
                   </option>
                 ))}
               </select>
               <select
                 id="city"
-                name="city"
+                name="cityId"
                 className="p-2 mt-2 border rounded-md"
-                value={info.city}
+                value={info.cityId || ''}
                 onChange={handleInfoChange}
               >
                 <option disabled selected>
-                  거주지
+                  시
                 </option>
-                {cityList?.city.map(({ id, name }) => (
-                  <option key={id} value={name}>
+                {cityList?.data.map(({ id, name }: Region) => (
+                  <option key={id} value={id}>
                     {name}
                   </option>
                 ))}
               </select>
               <select
                 id="district"
-                name="district"
+                name="districtId"
                 className="p-2 mt-2 border rounded-md"
-                value={info.district}
+                value={info.districtId}
                 onChange={handleInfoChange}
               >
-                <option selected>거주지</option>
-                {/* api 연동 후 처리 예정 */}
+                <option disabled selected>
+                  구
+                </option>
+                {districtList?.map(({ id, name }: Region) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
               </select>
             </div>{' '}
           </label>
           <Input
             name="detailAddress"
             onChange={handleInfoChange}
-            placeholder="(선택) 상세주소를 입력해주세요"
+            placeholder="상세주소를 입력해주세요"
           />
         </div>
         <div className="flex flex-col space-y-2">
@@ -281,14 +296,11 @@ const RegisterPage = () => {
       {!fill && (
         <p className="text-sm text-red-500">필수 요소들을 전부 입력해주세요</p>
       )}
-      {/* 버튼 컴포넌트로 대체 예정 */}
-      <button
-        type="button"
-        className="w-full py-3 text-sm text-center rounded-md bg-main-point hover:bg-main-point-dark"
+      <Button
+        text="고령자 등록하기"
+        className="text-sm text-center"
         onClick={onClickSubmit}
-      >
-        고령자 등록하기
-      </button>
+      />
     </div>
   );
 };
