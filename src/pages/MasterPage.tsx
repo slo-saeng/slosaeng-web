@@ -1,14 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { doctorProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import Button from '../component/common/Button/Button';
-import doctorList from '../mocks/doctorList.json';
-
-interface RoleData {
-  id: number;
-  state: string;
-  list: doctorProfile[];
-}
+import { useMember } from '../hooks/useMember';
+import { useInstitutionDoctor } from '../hooks/useInstitutionDoctor';
 
 const items = [
   { id: 'approve', text: '승인 관리' },
@@ -17,14 +12,21 @@ const items = [
 
 const MasterPage = () => {
   const [detail, setDetail] = useState<string>('approve');
+  const { data: loginData } = useMember();
+  const { data: doctorList } = useInstitutionDoctor(
+    loginData?.data.institutionNumber,
+  );
+  const notApprovedDoctorList = doctorList?.data.filter(
+    (doctor: doctorProfile) => doctor.role === 'NOT_APPROVED',
+  );
+  const approvedDoctorList = doctorList?.data.filter(
+    (doctor: doctorProfile) => doctor.role === 'DOCTOR',
+  );
+  const [tableData, setTableData] = useState<doctorProfile[]>([]);
 
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
-
-  const tableData: RoleData | undefined = doctorList.find(
-    (data) => data.state === detail,
-  );
 
   const onClickApprove = () => {
     alert('승인되었습니다.');
@@ -33,6 +35,11 @@ const MasterPage = () => {
   const onClickDelete = () => {
     alert('삭제되었습니다.');
   };
+
+  useEffect(() => {
+    if (detail === 'approve') setTableData(notApprovedDoctorList);
+    else if (detail === 'doctor') setTableData(approvedDoctorList);
+  }, [detail, doctorList]);
 
   return (
     <div className="flex">
@@ -58,7 +65,7 @@ const MasterPage = () => {
             </tr>
           </thead>
           <tbody>
-            {tableData?.list.map((data, index) => (
+            {tableData?.map((data, index) => (
               <tr className="hover:bg-main-base" key={data.id}>
                 <th>{index + 1}</th>
                 <td>{data.id}</td>
@@ -95,7 +102,5 @@ const MasterPage = () => {
     </div>
   );
 };
-
-MasterPage.propTypes = {};
 
 export default MasterPage;
