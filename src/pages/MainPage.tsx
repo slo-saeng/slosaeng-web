@@ -1,15 +1,48 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaAmbulance } from 'react-icons/fa';
 import { CiPill } from 'react-icons/ci';
 import { MdElderly } from 'react-icons/md';
 import ButtonCard from '../component/main/ButtonCard/ButtonCard';
 import Button from '../component/common/Button/Button';
 import HelpModal from '../component/main/HelpModal/HelpModal';
+import { useMember } from '../hooks/useMember';
+
+interface RenderItemData {
+  role: string;
+  text: string;
+  url: string;
+}
 
 const MainPage = () => {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [renderItemData, setRenderItemData] = useState<RenderItemData>();
+
+  const { data: loginData } = useMember();
+
+  const renderText = [
+    {
+      role: 'HELPER',
+      text: '고령자 확인하기',
+      url: '/helper',
+    },
+    {
+      role: 'MASTER',
+      text: '의료진 관리하기',
+      url: '/master',
+    },
+    {
+      role: 'DOCTOR',
+      text: '환자 관리하기',
+      url: '/doctor',
+    },
+  ];
+  useEffect(() => {
+    setRenderItemData(
+      renderText.find((item) => item.role === loginData?.data.role),
+    );
+  }, [loginData]);
 
   return (
     <>
@@ -21,10 +54,22 @@ const MainPage = () => {
             <br /> 도움을 줄 수 있는{' '}
             <span className="underline">의료 종사자</span>까지
           </p>
-          <Button text="로그인 하러 가기" onClick={() => navigate('/login')} />
-          <Link className="text-sm hover:underline" to="/signUp">
-            회원가입
-          </Link>
+          {renderItemData ? (
+            <Button
+              text={renderItemData?.text}
+              onClick={() => navigate(renderItemData.url)}
+            />
+          ) : (
+            <>
+              <Button
+                text="로그인 하러 가기"
+                onClick={() => navigate('/login')}
+              />
+              <Link className="text-sm hover:underline" to="/signUp">
+                회원가입
+              </Link>
+            </>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-10">
           <ButtonCard
