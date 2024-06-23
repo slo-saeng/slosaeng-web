@@ -7,3 +7,11 @@ export const getInstitutionDoctor = async (institutionNumber: number) => {
   }
   return response.data;
 };
+
+export const postApproveDoctor = async (doctorId: string) => {
+  const response = await server.post(`doctor/approve/${doctorId}`);
+  if (response.status !== 200) {
+    throw new Error('의료진 승인에 실패했습니다.');
+  }
+  return response.data;
+};

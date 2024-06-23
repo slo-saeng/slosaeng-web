@@ -4,6 +4,7 @@ import Sidebar from '../component/common/Sidebar/Sidebar';
 import Button from '../component/common/Button/Button';
 import { useMember } from '../hooks/useMember';
 import { useInstitutionDoctor } from '../hooks/useInstitutionDoctor';
+import { useApproveDoctorMutation } from '../hooks/useApproveDoctorMutation';
 
 const items = [
   { id: 'approve', text: '승인 관리' },
@@ -23,13 +24,14 @@ const MasterPage = () => {
     (doctor: doctorProfile) => doctor.role === 'DOCTOR',
   );
   const [tableData, setTableData] = useState<doctorProfile[]>([]);
+  const { approveDoctorMutate } = useApproveDoctorMutation();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
 
-  const onClickApprove = () => {
-    alert('승인되었습니다.');
+  const onClickApprove = (doctorId: string) => {
+    approveDoctorMutate(doctorId);
   };
 
   const onClickDelete = () => {
@@ -77,7 +79,7 @@ const MasterPage = () => {
                     <Button
                       text="승인"
                       className="text-white bg-green-500 hover:bg-green-600"
-                      onClick={() => onClickApprove()}
+                      onClick={() => onClickApprove(data.id)}
                     />
                     <Button
                       text="거절"
