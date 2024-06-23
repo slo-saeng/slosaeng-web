@@ -5,5 +5,6 @@ export const useMember = () => {
   return useQuery({
     queryKey: ['member'],
     queryFn: () => getMember(),
+    retry: 0,
   });
 };
