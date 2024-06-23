@@ -3,6 +3,7 @@ import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import { useMember } from '../../../hooks/useMember';
 import { elderProfile } from '../../../types/member';
+import { useEmergencyMutation } from '../../../hooks/useEmergencyMutation';
 
 interface HelpModalProps {
   closeModal: () => void;
@@ -12,15 +13,25 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
   const [elder, setElder] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [request, setRequest] = useState<boolean>(false);
-  const { data } = useMember();
+  const { emergencyMutate } = useEmergencyMutation();
 
   const onChangeReason = (e: ChangeEvent<HTMLInputElement>) => {
-    setReason(e.target.value);
+    setInfo(e.target.value);
   };
 
   const onClickRequest = () => {
-    if (elder && reason) {
+    if (info) {
+      emergencyMutate(
+        { info, elderId: elder },
+        {
+          onSuccess: () => {
       setRequest(true);
+          },
+          onError: () => {
+            setRequest(false);
+          },
+        },
+      );
     }
   };
 
@@ -42,12 +53,12 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
             <select
               className="p-2 border rounded-md"
               value={elder}
-              onChange={(e) => setElder(e.target.value)}
+              onChange={(e) => setElder(parseInt(e.target.value, 10))}
             >
               <option disabled>고령자를 선택해주세요</option>
-              {data?.data.elderIds.map(({ id, name }: elderProfile) => {
+              {data?.data.elders.map(({ id, name }: elderProfile) => {
                 return (
-                  <option key={id} value={name}>
+                  <option key={id} value={id}>
                     {name}
                   </option>
                 );
@@ -55,7 +66,7 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
             </select>
             <Input
               placeholder="사유를 간단히 입력해주세요"
-              name="reason"
+              name="info"
               onChange={onChangeReason}
             />
             <p className="text-sm text-red-500 text-start">
