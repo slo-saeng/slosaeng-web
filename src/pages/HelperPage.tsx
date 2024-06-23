@@ -3,18 +3,20 @@ import Button from '../component/common/Button/Button';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import { useMember } from '../hooks/useMember';
 import { elderProfile } from '../types/member';
+import { useCancelElderMutation } from '../hooks/useCancelElderMutation';
 
 const items = [{ id: 'elder', text: '고령자 관리' }];
 
 const HelperPage = () => {
   const [detail, setDetail] = useState<string>('elder');
   const { data: loginData } = useMember();
+  const { cancelElderMutate } = useCancelElderMutation();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
   const onClickDelete = (doctorId: number = 0) => {
-    alert(`${doctorId}가 삭제되었습니다.`);
+    cancelElderMutate(doctorId);
   };
 
   return (
