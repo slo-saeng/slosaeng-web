@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-import memberList from '../mocks/memberList.json';
 import type {
   doctorProfile,
   elderProfile,
@@ -8,12 +7,7 @@ import type {
   masterProfile,
 } from '../types/member';
 import Button from '../component/common/Button/Button';
-
-interface RoleData {
-  id: number;
-  role: string;
-  list: helperProfile[] | doctorProfile[] | masterProfile[] | elderProfile[];
-}
+import { useElder } from '../hooks/useElder';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -24,14 +18,18 @@ const items = [
 
 const SuperPage = () => {
   const [detail, setDetail] = useState<string>('elder');
+  const [tableData, setTableData] = useState<
+    helperProfile[] | doctorProfile[] | masterProfile[] | elderProfile[]
+  >([]);
+  const { data: elderData } = useElder();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
 
-  const tableData: RoleData | undefined = memberList.find(
-    (data) => data.role === detail,
-  );
+  useEffect(() => {
+    if (detail === 'elder') setTableData(elderData?.data);
+  }, [elderData]);
 
   const renderHeader = () => {
     switch (detail) {
@@ -130,7 +128,7 @@ const SuperPage = () => {
             </tr>
           </thead>
           <tbody>
-            {tableData?.list.map((data, index) => (
+            {tableData?.map((data, index) => (
               <tr className="hover:bg-main-base" key={data.id}>
                 <th>{index + 1}</th>
                 {renderBody(data)}

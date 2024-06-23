@@ -30,3 +30,11 @@ export const postElder = async ({
   }
   return response.data;
 };
+
+export const getElder = async () => {
+  const response = await server.get(`/elder`);
+  if (response.status !== 200) {
+    throw new Error('고령자 목록 조회에 실패했습니다.');
+  }
+  return response.data;
+};
