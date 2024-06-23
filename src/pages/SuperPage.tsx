@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import memberList from '../mocks/memberList.json';
 import type {
@@ -8,6 +9,7 @@ import type {
   masterProfile,
 } from '../types/member';
 import Button from '../component/common/Button/Button';
+import { useMember } from '../hooks/useMember';
 
 interface RoleData {
   id: number;
@@ -23,7 +25,9 @@ const items = [
 ];
 
 const SuperPage = () => {
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
+  const { data: loginData } = useMember();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -32,6 +36,12 @@ const SuperPage = () => {
   const tableData: RoleData | undefined = memberList.find(
     (data) => data.role === detail,
   );
+
+  useEffect(() => {
+    if (!loginData?.data && loginData?.data.role !== 'SUPER') {
+      navigate('/forbidden');
+    }
+  }, [loginData]);
 
   const renderHeader = () => {
     switch (detail) {

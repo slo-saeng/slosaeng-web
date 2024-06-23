@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import elderList from '../mocks/elderList.json';
 import { elderProfile, majorElderProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import Notification from '../component/doctor/Notification';
+import { useMember } from '../hooks/useMember';
 
 interface RoleData {
   id: number;
@@ -16,6 +18,7 @@ const items = [
 ];
 
 const DoctorPage = () => {
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
   const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
   const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
@@ -26,6 +29,7 @@ const DoctorPage = () => {
   >(null);
   const [selectedGrade, setSelectedGrade] = useState<string>('관심');
   const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
+  const { data: loginData } = useMember();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -37,6 +41,12 @@ const DoctorPage = () => {
   const majorElderListDataFiltered = elderListData.filter(
     (data) => data.role === 'majorElder',
   );
+
+  useEffect(() => {
+    if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
+      navigate('/forbidden');
+    }
+  }, [loginData]);
 
   const renderHeader = () => {
     switch (detail) {

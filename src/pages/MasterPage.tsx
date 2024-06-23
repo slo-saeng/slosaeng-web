@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { doctorProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import Button from '../component/common/Button/Button';
@@ -13,11 +14,13 @@ const items = [
 ];
 
 const MasterPage = () => {
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('approve');
   const { data: loginData } = useMember();
   const { data: doctorList } = useInstitutionDoctor(
     loginData?.data.institutionNumber,
   );
+
   const notApprovedDoctorList = doctorList?.data.filter(
     (doctor: doctorProfile) => doctor.role === 'NOT_APPROVED',
   );
@@ -39,6 +42,12 @@ const MasterPage = () => {
   const onClickDelete = (doctorId: string) => {
     cancelDoctorMutate(doctorId);
   };
+
+  useEffect(() => {
+    if (!loginData?.data && loginData?.data.role !== 'MASTER') {
+      navigate('/forbidden');
+    }
+  }, [loginData]);
 
   useEffect(() => {
     if (detail === 'approve') setTableData(notApprovedDoctorList);

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../component/common/Button/Button';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import { useMember } from '../hooks/useMember';
@@ -8,9 +9,16 @@ import { useCancelElderMutation } from '../hooks/useCancelElderMutation';
 const items = [{ id: 'elder', text: '고령자 관리' }];
 
 const HelperPage = () => {
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
   const { data: loginData } = useMember();
   const { cancelElderMutate } = useCancelElderMutation();
+
+  useEffect(() => {
+    if (!loginData?.data && loginData?.data.role !== 'HELPER') {
+      navigate('/forbidden');
+    }
+  }, [loginData]);
 
   const handleManageTable = (role: string) => {
     setDetail(role);
