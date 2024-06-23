@@ -5,6 +5,7 @@ import Button from '../component/common/Button/Button';
 import { useMember } from '../hooks/useMember';
 import { useInstitutionDoctor } from '../hooks/useInstitutionDoctor';
 import { useApproveDoctorMutation } from '../hooks/useApproveDoctorMutation';
+import { useCancelDoctorMutation } from '../hooks/useCancelDoctorMutation';
 
 const items = [
   { id: 'approve', text: '승인 관리' },
@@ -25,6 +26,7 @@ const MasterPage = () => {
   );
   const [tableData, setTableData] = useState<doctorProfile[]>([]);
   const { approveDoctorMutate } = useApproveDoctorMutation();
+  const { cancelDoctorMutate } = useCancelDoctorMutation();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -34,8 +36,8 @@ const MasterPage = () => {
     approveDoctorMutate(doctorId);
   };
 
-  const onClickDelete = () => {
-    alert('삭제되었습니다.');
+  const onClickDelete = (doctorId: string) => {
+    cancelDoctorMutate(doctorId);
   };
 
   useEffect(() => {
@@ -84,7 +86,7 @@ const MasterPage = () => {
                     <Button
                       text="거절"
                       className="text-white bg-red-500 hover:bg-red-600"
-                      onClick={() => onClickDelete()}
+                      onClick={() => onClickDelete(data.id)}
                     />
                   </td>
                 ) : (
@@ -92,7 +94,7 @@ const MasterPage = () => {
                     <Button
                       text="삭제"
                       className="text-white bg-red-500 hover:bg-red-600"
-                      onClick={() => onClickDelete()}
+                      onClick={() => onClickDelete(data.id)}
                     />
                   </td>
                 )}
