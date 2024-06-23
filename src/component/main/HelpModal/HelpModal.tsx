@@ -1,23 +1,38 @@
 import { useState, ChangeEvent } from 'react';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
+import { useMember } from '../../../hooks/useMember';
+import { elderProfile } from '../../../types/member';
+import { useEmergencyMutation } from '../../../hooks/useEmergencyMutation';
 
 interface HelpModalProps {
   closeModal: () => void;
 }
 
 const HelpModal = ({ closeModal }: HelpModalProps) => {
-  const [elder, setElder] = useState<string>('');
-  const [reason, setReason] = useState<string>('');
+  const { data } = useMember();
+  const [elder, setElder] = useState<number>(data?.data.elders[0].id);
+  const [info, setInfo] = useState<string>('');
   const [request, setRequest] = useState<boolean>(false);
+  const { emergencyMutate } = useEmergencyMutation();
 
   const onChangeReason = (e: ChangeEvent<HTMLInputElement>) => {
-    setReason(e.target.value);
+    setInfo(e.target.value);
   };
 
   const onClickRequest = () => {
-    if (elder && reason) {
-      setRequest(true);
+    if (info) {
+      emergencyMutate(
+        { info, elderId: elder },
+        {
+          onSuccess: () => {
+            setRequest(true);
+          },
+          onError: () => {
+            setRequest(false);
+          },
+        },
+      );
     }
   };
 
@@ -27,9 +42,12 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
         {request ? (
           <div className="flex flex-col space-y-8">
             <p className="text-center break-words whitespace-normal">
-              <span className="font-bold underline">{elder}</span>님에 대한 긴급
-              도움 요청을 완료하였습니다. <br />
-              거주 중인 수원시 장안구 내 병원으로 요청되었습니다. <br />
+              <span className="font-bold underline">
+                {data?.data.elders[elder - 1].name}
+              </span>
+              님에 대한 긴급 도움 요청을 완료하였습니다. <br />
+              거주 중인 {data?.data.elders[elder - 1].district.name} 내 병원으로
+              요청되었습니다. <br />
               수락한 병원 측에서 연락드릴 예정입니다.
             </p>
             <Button text="닫기" onClick={closeModal} />
@@ -39,23 +57,27 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
             <select
               className="p-2 border rounded-md"
               value={elder}
-              onChange={(e) => setElder(e.target.value)}
+              onChange={(e) => setElder(parseInt(e.target.value, 10))}
             >
               <option disabled>고령자를 선택해주세요</option>
-              <option value="김정은" selected>
-                김정은
-              </option>
-              <option value="이한음">이한음</option>
-              <option value="최수인">최수인</option>
+              {data?.data.elders.map(({ id, name }: elderProfile) => {
+                return (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                );
+              })}
             </select>
             <Input
               placeholder="사유를 간단히 입력해주세요"
-              name="reason"
+              name="info"
               onChange={onChangeReason}
             />
-            <p className="text-sm text-red-500 text-start">
-              ⚠️ 모든 내용을 작성해주세요
-            </p>
+            {!info && (
+              <p className="text-sm text-red-500 text-start">
+                ⚠️ 모든 내용을 작성해주세요
+              </p>
+            )}
             <p className="font-bold">
               해당 고령자에 대한 긴급 서비스를 요청하시겠습니까?
             </p>
