@@ -89,7 +89,7 @@ export const DoctorForm = () => {
       )}
       <PasswordInput
         name="password"
-        value={formValues.password}
+        value={formValues.password || ''}
         onChange={handleChange}
         placeholder="비밀번호"
       />

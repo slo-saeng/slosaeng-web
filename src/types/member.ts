@@ -27,10 +27,11 @@ export interface helperProfile {
 
 export interface doctorProfile {
   id: string;
-  password: string;
+  password?: string;
   name: string;
   phone: string;
   position: string;
+  role?: string;
   birth: string;
   institutionNumber: string;
 }
