@@ -8,6 +8,8 @@ import LoginPage from '../pages/LoginPage';
 import DoctorPage from '../pages/DoctorPage';
 import SuperPage from '../pages/SuperPage';
 import MasterPage from '../pages/MasterPage';
+import HelperPage from '../pages/HelperPage';
+import ForbiddenPage from '../pages/ForbiddenPage';
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -46,6 +48,14 @@ const Router = () => {
         {
           path: '/master',
           element: <MasterPage />,
+        },
+        {
+          path: '/helper',
+          element: <HelperPage />,
+        },
+        {
+          path: '/forbidden',
+          element: <ForbiddenPage />,
         },
       ],
     },

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import type {
   doctorProfile,
@@ -15,6 +16,7 @@ import { useCancelDoctorMutation } from '../hooks/useCancelDoctorMutation';
 import { useCancelElderMutation } from '../hooks/useCancelElderMutation';
 import { useCancelMasterMutation } from '../hooks/useCancelMasterMutation';
 import { useCancelHelperMutation } from '../hooks/useCancelHelperMutation';
+import { useMember } from '../hooks/useMember';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -24,6 +26,7 @@ const items = [
 ];
 
 const SuperPage = () => {
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
   const [tableData, setTableData] = useState<
     helperProfile[] | doctorProfile[] | masterProfile[] | elderProfile[]
@@ -36,6 +39,7 @@ const SuperPage = () => {
   const { cancelElderMutate } = useCancelElderMutation();
   const { cancelMasterMutate } = useCancelMasterMutation();
   const { cancelHelperMutate } = useCancelHelperMutation();
+  const { data: loginData } = useMember();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -56,6 +60,12 @@ const SuperPage = () => {
     else if (detail === 'doctor') setTableData(doctorData?.data);
     else if (detail === 'helper') setTableData(helperData?.data);
   }, [detail, elderData, hospitalData, doctorData, hospitalData]);
+
+  useEffect(() => {
+    if (!loginData?.data && loginData?.data.role !== 'SUPER') {
+      navigate('/forbidden');
+    }
+  }, [loginData]);
 
   const renderHeader = () => {
     switch (detail) {
