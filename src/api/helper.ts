@@ -7,3 +7,11 @@ export const getHelper = async () => {
   }
   return response.data;
 };
+
+export const deleteCancelHelper = async (helperId: string) => {
+  const response = await server.delete(`/helper/${helperId}`);
+  if (response.status !== 200) {
+    throw new Error('보호자 삭제에 실패했습니다.');
+  }
+  return response.data;
+};
