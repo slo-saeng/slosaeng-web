@@ -9,6 +9,8 @@ import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
 import BodyRow from '../component/doctor/elderList/BodyRow';
 import { useIntensiveCareMutation } from '../hooks/useIntensiveCareMutation';
+import { useElder } from '../hooks/useElder';
+import { useIntensiveCare } from '../hooks/useIntensiveCare';
 
 interface RoleData {
   id: number;
@@ -33,6 +35,8 @@ const DoctorPage = () => {
   >(null);
   const [selectedGrade, setSelectedGrade] = useState<string>('관심');
   const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
+  const { data: elderData } = useElder();
+  const { data: intensiveData } = useIntensiveCare();
   const { data: loginData } = useMember();
   const { intensiveCareMutate } = useIntensiveCareMutation();
 
@@ -46,6 +50,14 @@ const DoctorPage = () => {
   const majorElderListDataFiltered = elderListData.filter(
     (data) => data.role === 'majorElder',
   );
+
+  useEffect(() => {
+    if (detail === 'elder') {
+      setSelectedElder(elderData?.data);
+    } else if (detail === 'majorElder') {
+      setSelectedElder(intensiveData?.data);
+    }
+  }, [detail, elderData, intensiveData]);
 
   useEffect(() => {
     if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
