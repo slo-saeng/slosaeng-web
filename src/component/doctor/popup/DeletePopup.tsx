@@ -37,7 +37,10 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
           <tr>{renderHeader()}</tr>
         </thead>
         <tbody>
-          <tr className="hover:bg-main-base">{renderBody(selectedElder)}</tr>
+          <tr className="hover:bg-main-base">
+            <td>{selectedElder.id}</td>
+            {renderBody(selectedElder)}
+          </tr>
         </tbody>
       </table>
       <textarea

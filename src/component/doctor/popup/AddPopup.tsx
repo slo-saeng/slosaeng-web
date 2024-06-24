@@ -41,7 +41,10 @@ const AddPopup: React.FC<AddPopupProps> = ({
           <tr>{renderHeader()}</tr>
         </thead>
         <tbody>
-          <tr className="hover:bg-main-base">{renderBody(selectedElder)}</tr>
+          <tr className="hover:bg-main-base">
+            <td>{selectedElder.id}</td>
+            {renderBody(selectedElder)}
+          </tr>
         </tbody>
       </table>
       <select
