@@ -11,6 +11,10 @@ import { useElder } from '../hooks/useElder';
 import { useMaster } from '../hooks/useMaster';
 import { useDoctor } from '../hooks/useDoctor';
 import { useHelper } from '../hooks/useHelper';
+import { useCancelDoctorMutation } from '../hooks/useCancelDoctorMutation';
+import { useCancelElderMutation } from '../hooks/useCancelElderMutation';
+import { useCancelMasterMutation } from '../hooks/useCancelMasterMutation';
+import { useCancelHelperMutation } from '../hooks/useCancelHelperMutation';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -28,9 +32,22 @@ const SuperPage = () => {
   const { data: hospitalData } = useMaster();
   const { data: doctorData } = useDoctor();
   const { data: helperData } = useHelper();
+  const { cancelDoctorMutate } = useCancelDoctorMutation();
+  const { cancelElderMutate } = useCancelElderMutation();
+  const { cancelMasterMutate } = useCancelMasterMutation();
+  const { cancelHelperMutate } = useCancelHelperMutation();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
+  };
+
+  const onClickMemberDelete = (
+    data: elderProfile | doctorProfile | masterProfile | helperProfile,
+  ) => {
+    if (detail === 'elder') cancelElderMutate(data.id as number);
+    else if (detail === 'master') cancelMasterMutate(data.id as string);
+    else if (detail === 'doctor') cancelDoctorMutate(data.id as string);
+    else if (detail === 'helper') cancelHelperMutate(data.id as string);
   };
 
   useEffect(() => {
@@ -38,7 +55,7 @@ const SuperPage = () => {
     else if (detail === 'master') setTableData(hospitalData?.data);
     else if (detail === 'doctor') setTableData(doctorData?.data);
     else if (detail === 'helper') setTableData(helperData?.data);
-  }, [detail]);
+  }, [detail, elderData, hospitalData, doctorData, hospitalData]);
 
   const renderHeader = () => {
     switch (detail) {
@@ -145,6 +162,7 @@ const SuperPage = () => {
                   <Button
                     text="삭제"
                     className="text-white bg-red-500 hover:bg-red-600"
+                    onClick={() => onClickMemberDelete(data)}
                   />
                 </td>
               </tr>
