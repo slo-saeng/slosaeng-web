@@ -10,6 +10,7 @@ import Button from '../component/common/Button/Button';
 import { useElder } from '../hooks/useElder';
 import { useMaster } from '../hooks/useMaster';
 import { useDoctor } from '../hooks/useDoctor';
+import { useHelper } from '../hooks/useHelper';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -26,6 +27,7 @@ const SuperPage = () => {
   const { data: elderData } = useElder();
   const { data: hospitalData } = useMaster();
   const { data: doctorData } = useDoctor();
+  const { data: helperData } = useHelper();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -35,6 +37,7 @@ const SuperPage = () => {
     if (detail === 'elder') setTableData(elderData?.data);
     else if (detail === 'master') setTableData(hospitalData?.data);
     else if (detail === 'doctor') setTableData(doctorData?.data);
+    else if (detail === 'helper') setTableData(helperData?.data);
   }, [detail]);
 
   const renderHeader = () => {
