@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import elderList from '../mocks/elderList.json';
 import { elderProfile, majorElderProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-import Notification from '../component/doctor/Notification';
+import Notification from '../component/doctor/emergency/Notification';
 import { useMember } from '../hooks/useMember';
 import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
