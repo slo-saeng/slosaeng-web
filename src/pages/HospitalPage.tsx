@@ -27,42 +27,11 @@ const HospitalPage = () => {
     <div className="h-screen px-40 py-24 space-y-8">
       <h1 className="text-4xl font-bold">주변 의료기관 확인하기 🔎</h1>
       <div className="grid grid-cols-3 gap-2">
-        <select
-          id="nation"
-          name="nation"
-          className="w-full p-2 border rounded-md"
-          value={region.nation}
-          onChange={handleRegionChange}
-        >
-          <option disabled selected>
-            도
-          </option>
-          {addressList.map(({ id, name }) => (
-            <option key={id} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-        <select
-          id="city"
-          name="city"
-          className="w-full p-2 border rounded-md"
-          value={region.city}
-          onChange={handleRegionChange}
-        >
-          <option disabled selected>
-            시
-          </option>
-        </select>
-        <select
-          id="district"
-          name="district"
-          className="w-full p-2 border rounded-md"
-          value={region.district}
-          onChange={handleRegionChange}
-        >
-          <option selected>구</option>
-        </select>
+        <Input
+          placeholder="수원시"
+          name="search"
+          onChange={handleKeywordChange}
+        />
       </div>
       <p>
         <span className="text-main-point">경기도 수원시 영통구</span> 내
