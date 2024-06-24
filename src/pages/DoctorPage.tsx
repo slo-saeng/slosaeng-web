@@ -5,6 +5,9 @@ import { elderProfile, majorElderProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
 import Notification from '../component/doctor/Notification';
 import { useMember } from '../hooks/useMember';
+import AddPopup from '../component/doctor/popup/AddPopup';
+import DeletePopup from '../component/doctor/popup/DeletePopup';
+import BodyRow from '../component/doctor/elderList/BodyRow';
 
 interface RoleData {
   id: number;
@@ -48,7 +51,7 @@ const DoctorPage = () => {
     }
   }, [loginData]);
 
-  const renderHeader = () => {
+  const renderHeader = (): JSX.Element | null => {
     switch (detail) {
       case 'elder':
         return (
@@ -119,23 +122,20 @@ const DoctorPage = () => {
       return roleData;
     });
 
-    const updatedMajorElderList: RoleData[] = updatedList.map((roleData) => {
-      if (roleData.role === 'majorElder') {
-        const updatedElder = { ...selectedElder, grade: selectedGrade };
-        return {
-          ...roleData,
-          list: [...roleData.list, updatedElder],
-        };
-      }
-      return roleData;
-    });
+    const majorElderRoleData = updatedList.find(
+      (roleData) => roleData.role === 'majorElder',
+    );
 
-    setElderListData(updatedMajorElderList);
+    if (majorElderRoleData) {
+      majorElderRoleData.list.push({
+        ...selectedElder,
+        grade: selectedGrade,
+      } as majorElderProfile);
+    }
+
+    setElderListData(updatedList);
     setShowAddPopup(false);
-    setSearchQuery('');
     setReason('');
-    setSelectedElder(null);
-    setSelectedGrade('관심');
   };
 
   const handleDeletePopup = (
@@ -150,17 +150,6 @@ const DoctorPage = () => {
       setSearchQuery('');
       setReason('');
     }
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const searchElderByName = (
-    query: string,
-    list: (elderProfile | majorElderProfile)[],
-  ) => {
-    return list.filter((elder) => elder.name.includes(query.trim()));
   };
 
   const handleDeleteElder = () => {
@@ -181,252 +170,118 @@ const DoctorPage = () => {
       return roleData;
     });
 
-    const updatedElderList: RoleData[] = updatedList.map((roleData) => {
-      if (roleData.role === 'elder') {
-        const updatedElder = { ...selectedElder, grade: undefined };
-        return {
-          ...roleData,
-          list: [...roleData.list, updatedElder],
-        };
-      }
-      return roleData;
-    });
-
-    setElderListData(updatedElderList);
-    setShowDeletePopup(false);
-    setSearchQuery('');
-    setReason('');
-    setSelectedElder(null);
-  };
-
-  const getFilteredElders = () => {
-    if (searchQuery) {
-      if (detail === 'elder') {
-        return searchElderByName(searchQuery, elderListDataFiltered[0]?.list);
-      }
-      if (detail === 'majorElder') {
-        return searchElderByName(
-          searchQuery,
-          majorElderListDataFiltered[0]?.list,
-        );
-      }
-    }
-    if (detail === 'elder') return elderListDataFiltered[0]?.list;
-    if (detail === 'majorElder') return majorElderListDataFiltered[0]?.list;
-
-    return [];
-  };
-
-  const filteredElders = getFilteredElders();
-
-  const renderBody = (data: elderProfile | majorElderProfile) => {
-    const birthdate = extractBirthdate(data.idNumber);
-    let gradeColor = '';
-    if ('grade' in data) {
-      switch (data.grade) {
-        case '관심':
-          gradeColor = 'bg-green-200';
-          break;
-        case '주의':
-          gradeColor = 'bg-yellow-200';
-          break;
-        case '심각':
-          gradeColor = 'bg-red-200';
-          break;
-        default:
-          gradeColor = '';
-          break;
-      }
-    }
-    if ('grade' in data) {
-      return (
-        <>
-          <td>
-            {data.name} / {data.gender}
-          </td>
-          <td>{birthdate}</td>
-          <td>
-            {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
-          </td>
-          <td>{data.phone}</td>
-          <td>{data.bloodType}</td>
-          <td>{data.etc}</td>
-          <td className={gradeColor}>{data.grade}</td>
-        </>
-      );
-    }
-    return (
-      <>
-        <td>
-          {data.name} / {data.gender}
-        </td>
-        <td>{birthdate}</td>
-        <td>
-          {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
-        </td>
-        <td>{data.phone}</td>
-        <td>{data.bloodType}</td>
-        <td>{data.etc}</td>
-        <td> </td>
-      </>
+    const elderRoleData = updatedList.find(
+      (roleData) => roleData.role === 'elder',
     );
+
+    if (elderRoleData) {
+      elderRoleData.list.push({
+        ...selectedElder,
+        grade: undefined,
+      });
+    }
+
+    setElderListData(updatedList);
+    setShowDeletePopup(false);
+    setReason('');
   };
+
+  const handleSearchQueryChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filterData = (data: (elderProfile | majorElderProfile)[]) =>
+    data.filter((item) => item.name.includes(searchQuery));
+
+  const filteredElderList = filterData(elderListDataFiltered[0].list);
+  const filteredMajorElderList = filterData(majorElderListDataFiltered[0].list);
+
+  const renderBody = (data: elderProfile | majorElderProfile) => (
+    <>
+      <td>
+        {data.name} / {data.gender}
+      </td>
+      <td>{extractBirthdate(data.idNumber)}</td>
+      <td>
+        {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
+      </td>
+      <td>{data.phone}</td>
+      <td>{data.bloodType}</td>
+      <td>{data.etc}</td>
+      {'grade' in data && <td>{data.grade}</td>}
+    </>
+  );
 
   return (
     <div className="flex">
       <Sidebar
         sort="Doctor"
+        items={items}
         detail={detail}
         handleTable={handleManageTable}
-        items={items}
       />
-      <div className="w-4/5 p-8 mt-12">
-        <div className="flex justify-between">
-          <h1 className="mb-6 text-2xl font-bold">
-            {items.find((data) => data.id === detail)?.text}
-          </h1>
-          <div className="flex justify-end mb-4">
-            {detail && (
-              <input
-                type="text"
-                placeholder="검색"
-                className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-            )}
-          </div>
+      <div className="w-full p-16 space-y-6">
+        <Notification />
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold">
+            {detail === 'elder' ? '고령자 관리' : '주요대상 관리'}
+          </h2>
+          <input
+            type="text"
+            placeholder="검색"
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            className="px-4 py-2 border border-gray-300 rounded"
+          />
         </div>
         <table className="table text-center">
           <thead>
-            <tr>
-              <th> </th>
-              {renderHeader()}
-            </tr>
+            <tr>{renderHeader()}</tr>
           </thead>
           <tbody>
-            {filteredElders?.map((data, index) => (
-              <tr className="hover:bg-main-base" key={data.id}>
-                <th>{index + 1}</th>
-                {renderBody(data)}
-                {detail === 'elder' && (
-                  <td>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => handleAddPopup(true, data)}
-                    >
-                      추가
-                    </button>
-                  </td>
-                )}
-                {detail === 'majorElder' && (
-                  <td>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => handleDeletePopup(true, data)}
-                    >
-                      삭제
-                    </button>
-                  </td>
-                )}
-              </tr>
+            {(detail === 'elder'
+              ? filteredElderList
+              : filteredMajorElderList
+            ).map((elder, index) => (
+              <BodyRow
+                key={elder.id}
+                data={elder}
+                detail={detail}
+                index={index}
+                handleAddPopup={handleAddPopup}
+                handleDeletePopup={handleDeletePopup}
+                extractBirthdate={extractBirthdate}
+              />
             ))}
           </tbody>
         </table>
       </div>
-
       {showAddPopup && selectedElder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-1/2 p-8 space-y-6 bg-white rounded shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">주요대상 추가</h2>
-              <button
-                type="button"
-                className="text-xl font-bold"
-                onClick={() => handleAddPopup(false, null)}
-              >
-                &times;
-              </button>
-            </div>
-            <table className="table text-center">
-              <thead>
-                <tr>{renderHeader()}</tr>
-              </thead>
-              <tbody>
-                <tr className="hover:bg-main-base">
-                  {renderBody(selectedElder)}
-                </tr>
-              </tbody>
-            </table>
-            <select
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-            >
-              <option value="관심">관심</option>
-              <option value="주의">주의</option>
-              <option value="심각">심각</option>
-            </select>
-            <textarea
-              placeholder="추가 사유를 입력해주세요."
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-            <button
-              type="button"
-              className="w-full btn"
-              onClick={handleAddElder}
-            >
-              추가
-            </button>
-          </div>
-        </div>
+        <AddPopup
+          handleClose={() => setShowAddPopup(false)}
+          handleAddElder={handleAddElder}
+          selectedElder={selectedElder}
+          reason={reason}
+          setReason={setReason}
+          selectedGrade={selectedGrade}
+          setSelectedGrade={setSelectedGrade}
+          renderHeader={renderHeader}
+          renderBody={renderBody}
+        />
       )}
-
       {showDeletePopup && selectedElder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-1/2 p-8 space-y-6 bg-white rounded shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">주요대상 삭제</h2>
-              <button
-                type="button"
-                className="text-xl font-bold"
-                onClick={() => handleDeletePopup(false, null)}
-              >
-                ×
-              </button>
-            </div>
-
-            <table className="table text-center">
-              <thead>
-                <tr>{renderHeader()}</tr>
-              </thead>
-              <tbody>
-                <tr className="hover:bg-main-base">
-                  {renderBody(selectedElder)}
-                </tr>
-              </tbody>
-            </table>
-            <textarea
-              placeholder="삭제 사유를 입력해주세요."
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-            <button
-              type="button"
-              className="w-full btn"
-              onClick={handleDeleteElder}
-            >
-              삭제
-            </button>
-          </div>
-        </div>
+        <DeletePopup
+          handleClose={() => setShowDeletePopup(false)}
+          handleDeleteElder={handleDeleteElder}
+          selectedElder={selectedElder}
+          reason={reason}
+          setReason={setReason}
+          renderHeader={renderHeader}
+          renderBody={renderBody}
+        />
       )}
-      <Notification />
     </div>
   );
 };
