@@ -9,6 +9,7 @@ import type {
 import Button from '../component/common/Button/Button';
 import { useElder } from '../hooks/useElder';
 import { useMaster } from '../hooks/useMaster';
+import { useDoctor } from '../hooks/useDoctor';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -24,6 +25,7 @@ const SuperPage = () => {
   >([]);
   const { data: elderData } = useElder();
   const { data: hospitalData } = useMaster();
+  const { data: doctorData } = useDoctor();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -32,7 +34,8 @@ const SuperPage = () => {
   useEffect(() => {
     if (detail === 'elder') setTableData(elderData?.data);
     else if (detail === 'master') setTableData(hospitalData?.data);
-  }, [elderData]);
+    else if (detail === 'doctor') setTableData(doctorData?.data);
+  }, [detail]);
 
   const renderHeader = () => {
     switch (detail) {
