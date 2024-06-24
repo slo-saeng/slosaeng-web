@@ -9,7 +9,7 @@ export const useCancelDoctorMutation = () => {
       if (data) {
         alert('거절되었어요.');
         queryClient.invalidateQueries({
-          queryKey: ['cancelDoctor'],
+          queryKey: ['doctor'],
         });
       }
     },
