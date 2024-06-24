@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import elderList from '../mocks/elderList.json';
 import { elderProfile, majorElderProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-import Notification from '../component/doctor/emergency/Notification';
+// import Notification from '../component/doctor/emergency/Notification';
 import { useMember } from '../hooks/useMember';
 import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
@@ -56,6 +56,7 @@ const DoctorPage = () => {
       case 'elder':
         return (
           <>
+            <th> </th>
             <th>이름/성별</th>
             <th>생년월일</th>
             <th>거주지역</th>
@@ -67,6 +68,7 @@ const DoctorPage = () => {
       case 'majorElder':
         return (
           <>
+            <th> </th>
             <th>이름/성별</th>
             <th>생년월일</th>
             <th>거주지역</th>
@@ -222,8 +224,7 @@ const DoctorPage = () => {
         detail={detail}
         handleTable={handleManageTable}
       />
-      <div className="w-full p-16 space-y-6">
-        <Notification />
+      <div className="w-full p-20 space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">
             {detail === 'elder' ? '고령자 관리' : '주요대상 관리'}

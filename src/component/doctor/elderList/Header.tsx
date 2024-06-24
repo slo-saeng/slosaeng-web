@@ -9,6 +9,7 @@ const Header: React.FC<HeaderProps> = ({ detail }) => {
     case 'elder':
       return (
         <>
+          <th> </th>
           <th>이름/성별</th>
           <th>생년월일</th>
           <th>거주지역</th>
@@ -20,6 +21,7 @@ const Header: React.FC<HeaderProps> = ({ detail }) => {
     case 'majorElder':
       return (
         <>
+          <th> </th>
           <th>이름/성별</th>
           <th>생년월일</th>
           <th>거주지역</th>
