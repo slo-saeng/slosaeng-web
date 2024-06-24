@@ -11,6 +11,7 @@ import BodyRow from '../component/doctor/elderList/BodyRow';
 import { useIntensiveCareMutation } from '../hooks/useIntensiveCareMutation';
 import { useElder } from '../hooks/useElder';
 import { useIntensiveCare } from '../hooks/useIntensiveCare';
+import { useCancelIntensiveMutation } from '../hooks/useCancelIntensiveMutation';
 
 interface RoleData {
   id: number;
@@ -37,6 +38,7 @@ const DoctorPage = () => {
   const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
   const { data: elderData } = useElder();
   const { data: intensiveData } = useIntensiveCare();
+  const { cancelIntensiveMutate } = useCancelIntensiveMutation();
   const { data: loginData } = useMember();
   const { intensiveCareMutate } = useIntensiveCareMutation();
 
@@ -201,6 +203,8 @@ const DoctorPage = () => {
         grade: undefined,
       });
     }
+
+    cancelIntensiveMutate(selectedElder.id as number);
 
     setElderListData(updatedList);
     setShowDeletePopup(false);
