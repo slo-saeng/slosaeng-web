@@ -38,3 +38,11 @@ export const getElder = async () => {
   }
   return response.data;
 };
+
+export const deleteCancelElder = async (elderId: number) => {
+  const response = await server.delete(`/elder/${elderId}`);
+  if (response.status !== 200) {
+    throw new Error('고령자 거절에 실패했습니다.');
+  }
+  return response.data;
+};
