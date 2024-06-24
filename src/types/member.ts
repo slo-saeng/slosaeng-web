@@ -13,6 +13,7 @@ export interface elderProfile {
 }
 
 export interface majorElderProfile extends elderProfile {
+  info: string;
   grade: string;
 }
 
