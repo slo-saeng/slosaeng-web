@@ -45,3 +45,11 @@ export const getSearchIntensiveCare = async (elderId: number) => {
   }
   return response.data;
 };
+
+export const patchIntensiveCare = async (elderId: number) => {
+  const response = await server.patch(`/intensive-care/${elderId}`);
+  if (response.status !== 200) {
+    throw new Error('정상적으로 수정이 되지 않았습니다.');
+  }
+  return response.data;
+};

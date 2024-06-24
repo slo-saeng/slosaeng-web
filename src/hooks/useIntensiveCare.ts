@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { getIntensiveCare, getSearchIntensiveCare } from '../api/intensiveCare';
+import { getIntensiveCare } from '../api/intensiveCare';
 
 export const useIntensiveCare = () => {
   return useQuery({
