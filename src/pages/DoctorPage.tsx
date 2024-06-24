@@ -8,6 +8,7 @@ import { useMember } from '../hooks/useMember';
 import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
 import BodyRow from '../component/doctor/elderList/BodyRow';
+import { useIntensiveCareMutation } from '../hooks/useIntensiveCareMutation';
 
 interface RoleData {
   id: number;
@@ -33,6 +34,7 @@ const DoctorPage = () => {
   const [selectedGrade, setSelectedGrade] = useState<string>('관심');
   const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
   const { data: loginData } = useMember();
+  const { intensiveCareMutate } = useIntensiveCareMutation();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
@@ -135,6 +137,11 @@ const DoctorPage = () => {
       } as majorElderProfile);
     }
 
+    intensiveCareMutate({
+      id: selectedElder.id!,
+      info: reason,
+      grade: selectedGrade,
+    });
     setElderListData(updatedList);
     setShowAddPopup(false);
     setReason('');
