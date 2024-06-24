@@ -7,3 +7,11 @@ export const getMaster = async () => {
   }
   return response.data;
 };
+
+export const deleteCancelMaster = async (masterId: string) => {
+  const response = await server.delete(`/master/${masterId}`);
+  if (response.status !== 200) {
+    throw new Error('병원 삭제에 실패했습니다.');
+  }
+  return response.data;
+};
