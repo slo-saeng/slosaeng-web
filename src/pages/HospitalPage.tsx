@@ -1,28 +1,14 @@
 import { ChangeEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
-import addressList from '../mocks/addressList.json';
-
-interface Region {
-  nation: string;
-  city: string;
-  district: string;
-}
-const defaultRegion = {
-  nation: '',
-  city: '',
-  district: '',
-};
+import { useInstitutionByKeyword } from '../hooks/useInstitutionByKeyword';
+import { institutionInfo } from '../types/institution';
+import Input from '../component/common/Input/Input';
 
 const HospitalPage = () => {
-  const [region, setRegion] = useState<Region>(defaultRegion);
-  const handleRegionChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setRegion((prevInfo) => ({
-      ...prevInfo,
-      [name]: value,
-    }));
+  const [keyword, setKeyword] = useState<string>('수원시');
+  const { data: institutionKeywordData } = useInstitutionByKeyword(keyword);
+  const handleKeywordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value);
   };
-
   return (
     <div className="h-screen px-40 py-24 space-y-8">
       <h1 className="text-4xl font-bold">주변 의료기관 확인하기 🔎</h1>
@@ -34,7 +20,7 @@ const HospitalPage = () => {
         />
       </div>
       <p>
-        <span className="text-main-point">경기도 수원시 영통구</span> 내
+        <span className="text-main-point">{keyword}</span> 로 검색한
         의료기관입니다.
       </p>
       <div className="overflow-x-auto">
@@ -43,45 +29,23 @@ const HospitalPage = () => {
             <tr>
               <th> </th>
               <th>🏥 병원명</th>
-              <th>📍 주소</th>
-              <th>📞 연락처</th>
-              <th>🌐 홈페이지</th>
+              <th>📁 분류</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="hover:bg-main-base">
-              <th>1</th>
-              <td>아주대학교 병원</td>
-              <td>경기 수원시 영통구 월드컵로 164</td>
-              <td>1688-6114</td>
-              <td>
-                <Link to="http://hosp.ajoumc.or.kr/">
-                  http://hosp.ajoumc.or.kr/
-                </Link>
-              </td>
-            </tr>
-            <tr className="hover:bg-main-base">
-              <th>2</th>
-              <td>아주대학교 병원</td>
-              <td>경기 수원시 영통구 월드컵로 164</td>
-              <td>1688-6114</td>
-              <td>
-                <Link to="http://hosp.ajoumc.or.kr/">
-                  http://hosp.ajoumc.or.kr/
-                </Link>
-              </td>
-            </tr>
-            <tr className="hover:bg-main-base">
-              <th>3</th>
-              <td>아주대학교 병원</td>
-              <td>경기 수원시 영통구 월드컵로 164</td>
-              <td>1688-6114</td>
-              <td>
-                <Link to="http://hosp.ajoumc.or.kr/">
-                  http://hosp.ajoumc.or.kr/
-                </Link>
-              </td>
-            </tr>
+            {institutionKeywordData?.data.map(
+              (data: institutionInfo, index: number) => {
+                return (
+                  <tr className="hover:bg-main-base" key={data.name}>
+                    <th>{index + 1}</th>
+                    <td className="hover:underline hover:cursor-pointer">
+                      {data.name}
+                    </td>
+                    <th>{data.type}</th>
+                  </tr>
+                );
+              },
+            )}
           </tbody>
         </table>
       </div>
