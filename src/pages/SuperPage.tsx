@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-import memberList from '../mocks/memberList.json';
 import type {
   doctorProfile,
   elderProfile,
@@ -9,13 +8,15 @@ import type {
   masterProfile,
 } from '../types/member';
 import Button from '../component/common/Button/Button';
+import { useElder } from '../hooks/useElder';
+import { useMaster } from '../hooks/useMaster';
+import { useDoctor } from '../hooks/useDoctor';
+import { useHelper } from '../hooks/useHelper';
+import { useCancelDoctorMutation } from '../hooks/useCancelDoctorMutation';
+import { useCancelElderMutation } from '../hooks/useCancelElderMutation';
+import { useCancelMasterMutation } from '../hooks/useCancelMasterMutation';
+import { useCancelHelperMutation } from '../hooks/useCancelHelperMutation';
 import { useMember } from '../hooks/useMember';
-
-interface RoleData {
-  id: number;
-  role: string;
-  list: helperProfile[] | doctorProfile[] | masterProfile[] | elderProfile[];
-}
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -27,15 +28,38 @@ const items = [
 const SuperPage = () => {
   const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
+  const [tableData, setTableData] = useState<
+    helperProfile[] | doctorProfile[] | masterProfile[] | elderProfile[]
+  >([]);
+  const { data: elderData } = useElder();
+  const { data: hospitalData } = useMaster();
+  const { data: doctorData } = useDoctor();
+  const { data: helperData } = useHelper();
+  const { cancelDoctorMutate } = useCancelDoctorMutation();
+  const { cancelElderMutate } = useCancelElderMutation();
+  const { cancelMasterMutate } = useCancelMasterMutation();
+  const { cancelHelperMutate } = useCancelHelperMutation();
   const { data: loginData } = useMember();
 
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
 
-  const tableData: RoleData | undefined = memberList.find(
-    (data) => data.role === detail,
-  );
+  const onClickMemberDelete = (
+    data: elderProfile | doctorProfile | masterProfile | helperProfile,
+  ) => {
+    if (detail === 'elder') cancelElderMutate(data.id as number);
+    else if (detail === 'master') cancelMasterMutate(data.id as string);
+    else if (detail === 'doctor') cancelDoctorMutate(data.id as string);
+    else if (detail === 'helper') cancelHelperMutate(data.id as string);
+  };
+
+  useEffect(() => {
+    if (detail === 'elder') setTableData(elderData?.data);
+    else if (detail === 'master') setTableData(hospitalData?.data);
+    else if (detail === 'doctor') setTableData(doctorData?.data);
+    else if (detail === 'helper') setTableData(helperData?.data);
+  }, [detail, elderData, hospitalData, doctorData, hospitalData]);
 
   useEffect(() => {
     if (!loginData?.data && loginData?.data.role !== 'SUPER') {
@@ -140,7 +164,7 @@ const SuperPage = () => {
             </tr>
           </thead>
           <tbody>
-            {tableData?.list.map((data, index) => (
+            {tableData?.map((data, index) => (
               <tr className="hover:bg-main-base" key={data.id}>
                 <th>{index + 1}</th>
                 {renderBody(data)}
@@ -148,6 +172,7 @@ const SuperPage = () => {
                   <Button
                     text="삭제"
                     className="text-white bg-red-500 hover:bg-red-600"
+                    onClick={() => onClickMemberDelete(data)}
                   />
                 </td>
               </tr>

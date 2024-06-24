@@ -9,7 +9,7 @@ export const useCancelElderMutation = () => {
       if (data) {
         alert('삭제되었어요.');
         queryClient.invalidateQueries({
-          queryKey: ['cancelElder'],
+          queryKey: ['elder'],
         });
       }
     },

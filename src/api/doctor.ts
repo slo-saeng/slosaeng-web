@@ -23,3 +23,11 @@ export const deleteCancelDoctor = async (doctorId: string) => {
   }
   return response.data;
 };
+
+export const getDoctor = async () => {
+  const response = await server.get(`/doctor`);
+  if (response.status !== 200) {
+    throw new Error('의료진 조회에 실패했습니다.');
+  }
+  return response.data;
+};
