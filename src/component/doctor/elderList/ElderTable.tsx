@@ -36,7 +36,6 @@ const ElderTable: React.FC<ElderTableProps> = ({
         <BodyRow
           key={data.id}
           data={data}
-          detail={detail}
           index={index}
           handleAddPopup={handleAddPopup}
           handleDeletePopup={handleDeletePopup}

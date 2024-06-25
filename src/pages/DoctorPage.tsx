@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import elderList from '../mocks/elderList.json';
-import { elderProfile, majorElderProfile } from '../types/member';
+import type { elderProfile, intensiceCareProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-// import Notification from '../component/doctor/emergency/Notification';
 import { useMember } from '../hooks/useMember';
 import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
@@ -12,12 +10,6 @@ import { useIntensiveCareMutation } from '../hooks/useIntensiveCareMutation';
 import { useElder } from '../hooks/useElder';
 import { useIntensiveCare } from '../hooks/useIntensiveCare';
 import { useCancelIntensiveMutation } from '../hooks/useCancelIntensiveMutation';
-
-interface RoleData {
-  id: number;
-  role: string;
-  list: (elderProfile | majorElderProfile)[];
-}
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -32,32 +24,27 @@ const DoctorPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [selectedElder, setSelectedElder] = useState<
-    elderProfile | majorElderProfile | null
+    elderProfile | intensiceCareProfile | null
   >(null);
   const [selectedGrade, setSelectedGrade] = useState<string>('관심');
-  const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
   const { data: elderData } = useElder();
   const { data: intensiveData } = useIntensiveCare();
   const { cancelIntensiveMutate } = useCancelIntensiveMutation();
   const { data: loginData } = useMember();
   const { intensiveCareMutate } = useIntensiveCareMutation();
-
+  const [elderListData, setElderListData] = useState<elderProfile[]>([]);
+  const [intensiveListData, setIntensiveListData] = useState<
+    intensiceCareProfile[]
+  >([]);
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
 
-  const elderListDataFiltered = elderListData.filter(
-    (data) => data.role === 'elder',
-  );
-  const majorElderListDataFiltered = elderListData.filter(
-    (data) => data.role === 'majorElder',
-  );
-
   useEffect(() => {
     if (detail === 'elder') {
-      setSelectedElder(elderData?.data);
+      setElderListData(elderData?.data);
     } else if (detail === 'majorElder') {
-      setSelectedElder(intensiveData?.data);
+      setIntensiveListData(intensiveData?.data);
     }
   }, [detail, elderData, intensiveData]);
 
@@ -100,8 +87,8 @@ const DoctorPage = () => {
   };
 
   const extractBirthdate = (idNumber: string) => {
-    const yearPrefix = parseInt(idNumber[6], 10) <= 2 ? '20' : '19';
-    const year = yearPrefix + idNumber.substring(0, 2);
+    if (!idNumber) return '';
+    const year = idNumber.substring(0, 2);
     const month = idNumber.substring(2, 4);
     const day = idNumber.substring(4, 6);
     return `${year}-${month}-${day}`;
@@ -109,7 +96,7 @@ const DoctorPage = () => {
 
   const handleAddPopup = (
     open: boolean,
-    elder: elderProfile | majorElderProfile | null,
+    elder: elderProfile | intensiceCareProfile | null,
   ) => {
     setShowAddPopup(open);
     if (open && elder) {
@@ -130,40 +117,18 @@ const DoctorPage = () => {
       return;
     }
 
-    const updatedList: RoleData[] = elderListData.map((roleData) => {
-      if (roleData.role === 'elder') {
-        return {
-          ...roleData,
-          list: roleData.list.filter((elder) => elder.id !== selectedElder.id),
-        };
-      }
-      return roleData;
-    });
-
-    const majorElderRoleData = updatedList.find(
-      (roleData) => roleData.role === 'majorElder',
-    );
-
-    if (majorElderRoleData) {
-      majorElderRoleData.list.push({
-        ...selectedElder,
-        grade: selectedGrade,
-      } as majorElderProfile);
-    }
-
     intensiveCareMutate({
       id: selectedElder.id!,
       info: reason,
       grade: selectedGrade,
     });
-    setElderListData(updatedList);
     setShowAddPopup(false);
     setReason('');
   };
 
   const handleDeletePopup = (
     open: boolean,
-    elder: elderProfile | majorElderProfile | null,
+    elder: elderProfile | intensiceCareProfile | null,
   ) => {
     setShowDeletePopup(open);
     if (open && elder) {
@@ -183,30 +148,7 @@ const DoctorPage = () => {
       return;
     }
 
-    const updatedList: RoleData[] = elderListData.map((roleData) => {
-      if (roleData.role === 'majorElder') {
-        return {
-          ...roleData,
-          list: roleData.list.filter((elder) => elder.id !== selectedElder.id),
-        };
-      }
-      return roleData;
-    });
-
-    const elderRoleData = updatedList.find(
-      (roleData) => roleData.role === 'elder',
-    );
-
-    if (elderRoleData) {
-      elderRoleData.list.push({
-        ...selectedElder,
-        grade: undefined,
-      });
-    }
-
     cancelIntensiveMutate(selectedElder.id as number);
-
-    setElderListData(updatedList);
     setShowDeletePopup(false);
     setReason('');
   };
@@ -215,29 +157,59 @@ const DoctorPage = () => {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setSearchQuery(event.target.value);
+
+    if (detail === 'elder')
+      setElderListData(
+        elderData.filter((item: elderProfile) =>
+          item.name.includes(searchQuery),
+        ),
+      );
+    else if (detail === 'majorElder')
+      setIntensiveListData(
+        intensiveData.filter((item: intensiceCareProfile) =>
+          item.name.includes(searchQuery),
+        ),
+      );
   };
-
-  const filterData = (data: (elderProfile | majorElderProfile)[]) =>
-    data.filter((item) => item.name.includes(searchQuery));
-
-  const filteredElderList = filterData(elderListDataFiltered[0].list);
-  const filteredMajorElderList = filterData(majorElderListDataFiltered[0].list);
-
-  const renderBody = (data: elderProfile | majorElderProfile) => (
-    <>
-      <td>
-        {data.name} / {data.gender}
-      </td>
-      <td>{extractBirthdate(data.idNumber)}</td>
-      <td>
-        {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
-      </td>
-      <td>{data.phone}</td>
-      <td>{data.bloodType}</td>
-      <td>{data.etc}</td>
-      {'grade' in data && <td>{data.grade}</td>}
-    </>
-  );
+  const renderBody = (data: elderProfile | intensiceCareProfile) => {
+    if ('elder' in data) {
+      const selectedElderData = data as intensiceCareProfile;
+      return (
+        <>
+          <td>
+            {selectedElderData.elder.name} / {selectedElderData.elder.gender}
+          </td>
+          <td>{extractBirthdate(selectedElderData.elder.idNumber)}</td>
+          <td>
+            {selectedElderData.elder.nation.name}{' '}
+            {selectedElderData.elder.city.name}{' '}
+            {selectedElderData.elder.district.name}{' '}
+            {selectedElderData.elder.detailAddress}
+          </td>
+          <td>{selectedElderData.elder.phone}</td>
+          <td>{selectedElderData.elder.bloodType}</td>
+          <td>{selectedElderData.elder.etc}</td>
+          <td>{selectedElderData.grade ?? ''}</td>
+        </>
+      );
+    }
+    const basicData = data as elderProfile;
+    return (
+      <>
+        <td>
+          {basicData.name} / {basicData.gender}
+        </td>
+        <td>{extractBirthdate(basicData.idNumber)}</td>
+        <td>
+          {basicData.nationId} {basicData.cityId ?? ''} {basicData.districtId}{' '}
+          {basicData.detailAddress}
+        </td>
+        <td>{basicData.phone}</td>
+        <td>{basicData.bloodType}</td>
+        <td>{basicData.etc ?? ''}</td>
+      </>
+    );
+  };
 
   return (
     <div className="flex">
@@ -265,20 +237,18 @@ const DoctorPage = () => {
             <tr>{renderHeader()}</tr>
           </thead>
           <tbody>
-            {(detail === 'elder'
-              ? filteredElderList
-              : filteredMajorElderList
-            ).map((elder, index) => (
-              <BodyRow
-                key={elder.id}
-                data={elder}
-                detail={detail}
-                index={index}
-                handleAddPopup={handleAddPopup}
-                handleDeletePopup={handleDeletePopup}
-                extractBirthdate={extractBirthdate}
-              />
-            ))}
+            {(detail === 'elder' ? elderListData : intensiveListData)?.map(
+              (elder, index) => (
+                <BodyRow
+                  key={elder.id}
+                  data={elder}
+                  index={index}
+                  handleAddPopup={handleAddPopup}
+                  handleDeletePopup={handleDeletePopup}
+                  extractBirthdate={extractBirthdate}
+                />
+              ),
+            )}
           </tbody>
         </table>
       </div>
