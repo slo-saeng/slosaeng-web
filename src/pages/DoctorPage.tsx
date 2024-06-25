@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import elderList from '../mocks/elderList.json';
-import { elderProfile, majorElderProfile } from '../types/member';
+import type { elderProfile, intensiceCareProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-import Notification from '../component/doctor/Notification';
 import { useMember } from '../hooks/useMember';
-
-interface RoleData {
-  id: number;
-  role: string;
-  list: (elderProfile | majorElderProfile)[];
-}
+import AddPopup from '../component/doctor/popup/AddPopup';
+import DeletePopup from '../component/doctor/popup/DeletePopup';
+import BodyRow from '../component/doctor/elderList/BodyRow';
+import { useIntensiveCareMutation } from '../hooks/useIntensiveCareMutation';
+import { useElder } from '../hooks/useElder';
+import { useIntensiveCare } from '../hooks/useIntensiveCare';
+import { useCancelIntensiveMutation } from '../hooks/useCancelIntensiveMutation';
+import { useEmergency } from '../hooks/useEmergency';
+import SupportRequestPopup from '../component/doctor/emergency/SupportRequestPopup';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -25,22 +26,34 @@ const DoctorPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [reason, setReason] = useState<string>('');
   const [selectedElder, setSelectedElder] = useState<
-    elderProfile | majorElderProfile | null
+    elderProfile | intensiceCareProfile | null
   >(null);
   const [selectedGrade, setSelectedGrade] = useState<string>('관심');
-  const [elderListData, setElderListData] = useState<RoleData[]>(elderList);
+  const { data: elderData } = useElder();
+  const { data: intensiveData } = useIntensiveCare();
+  const { cancelIntensiveMutate } = useCancelIntensiveMutation();
   const { data: loginData } = useMember();
-
+  const { intensiveCareMutate } = useIntensiveCareMutation();
+  const [elderListData, setElderListData] = useState<elderProfile[]>([]);
+  const [intensiveListData, setIntensiveListData] = useState<
+    intensiceCareProfile[]
+  >([]);
+  const { data: emergencyData } = useEmergency();
+  const [emergencyPopup, setEmergencyPopup] = useState<boolean>(false);
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
+  useEffect(() => {
+    setEmergencyPopup(true);
+  }, [emergencyData]);
 
-  const elderListDataFiltered = elderListData.filter(
-    (data) => data.role === 'elder',
-  );
-  const majorElderListDataFiltered = elderListData.filter(
-    (data) => data.role === 'majorElder',
-  );
+  useEffect(() => {
+    if (detail === 'elder') {
+      setElderListData(elderData?.data);
+    } else if (detail === 'majorElder') {
+      setIntensiveListData(intensiveData?.data);
+    }
+  }, [detail, elderData, intensiveData]);
 
   useEffect(() => {
     if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
@@ -48,11 +61,12 @@ const DoctorPage = () => {
     }
   }, [loginData]);
 
-  const renderHeader = () => {
+  const renderHeader = (): JSX.Element | null => {
     switch (detail) {
       case 'elder':
         return (
           <>
+            <th> </th>
             <th>이름/성별</th>
             <th>생년월일</th>
             <th>거주지역</th>
@@ -64,6 +78,7 @@ const DoctorPage = () => {
       case 'majorElder':
         return (
           <>
+            <th> </th>
             <th>이름/성별</th>
             <th>생년월일</th>
             <th>거주지역</th>
@@ -79,8 +94,8 @@ const DoctorPage = () => {
   };
 
   const extractBirthdate = (idNumber: string) => {
-    const yearPrefix = parseInt(idNumber[6], 10) <= 2 ? '20' : '19';
-    const year = yearPrefix + idNumber.substring(0, 2);
+    if (!idNumber) return '';
+    const year = idNumber.substring(0, 2);
     const month = idNumber.substring(2, 4);
     const day = idNumber.substring(4, 6);
     return `${year}-${month}-${day}`;
@@ -88,7 +103,7 @@ const DoctorPage = () => {
 
   const handleAddPopup = (
     open: boolean,
-    elder: elderProfile | majorElderProfile | null,
+    elder: elderProfile | intensiceCareProfile | null,
   ) => {
     setShowAddPopup(open);
     if (open && elder) {
@@ -109,38 +124,18 @@ const DoctorPage = () => {
       return;
     }
 
-    const updatedList: RoleData[] = elderListData.map((roleData) => {
-      if (roleData.role === 'elder') {
-        return {
-          ...roleData,
-          list: roleData.list.filter((elder) => elder.id !== selectedElder.id),
-        };
-      }
-      return roleData;
+    intensiveCareMutate({
+      id: selectedElder.id!,
+      info: reason,
+      grade: selectedGrade,
     });
-
-    const updatedMajorElderList: RoleData[] = updatedList.map((roleData) => {
-      if (roleData.role === 'majorElder') {
-        const updatedElder = { ...selectedElder, grade: selectedGrade };
-        return {
-          ...roleData,
-          list: [...roleData.list, updatedElder],
-        };
-      }
-      return roleData;
-    });
-
-    setElderListData(updatedMajorElderList);
     setShowAddPopup(false);
-    setSearchQuery('');
     setReason('');
-    setSelectedElder(null);
-    setSelectedGrade('관심');
   };
 
   const handleDeletePopup = (
     open: boolean,
-    elder: elderProfile | majorElderProfile | null,
+    elder: elderProfile | intensiceCareProfile | null,
   ) => {
     setShowDeletePopup(open);
     if (open && elder) {
@@ -152,17 +147,6 @@ const DoctorPage = () => {
     }
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const searchElderByName = (
-    query: string,
-    list: (elderProfile | majorElderProfile)[],
-  ) => {
-    return list.filter((elder) => elder.name.includes(query.trim()));
-  };
-
   const handleDeleteElder = () => {
     if (!selectedElder) return;
 
@@ -171,263 +155,148 @@ const DoctorPage = () => {
       return;
     }
 
-    const updatedList: RoleData[] = elderListData.map((roleData) => {
-      if (roleData.role === 'majorElder') {
-        return {
-          ...roleData,
-          list: roleData.list.filter((elder) => elder.id !== selectedElder.id),
-        };
-      }
-      return roleData;
-    });
-
-    const updatedElderList: RoleData[] = updatedList.map((roleData) => {
-      if (roleData.role === 'elder') {
-        const updatedElder = { ...selectedElder, grade: undefined };
-        return {
-          ...roleData,
-          list: [...roleData.list, updatedElder],
-        };
-      }
-      return roleData;
-    });
-
-    setElderListData(updatedElderList);
+    cancelIntensiveMutate(selectedElder.id as number);
     setShowDeletePopup(false);
-    setSearchQuery('');
     setReason('');
-    setSelectedElder(null);
   };
 
-  const getFilteredElders = () => {
-    if (searchQuery) {
-      if (detail === 'elder') {
-        return searchElderByName(searchQuery, elderListDataFiltered[0]?.list);
-      }
-      if (detail === 'majorElder') {
-        return searchElderByName(
-          searchQuery,
-          majorElderListDataFiltered[0]?.list,
+  const handleSearchQueryChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { value } = event.target;
+    setSearchQuery(value);
+
+    if (detail === 'elder') {
+      if (Array.isArray(elderData?.data)) {
+        const filteredElderList = elderData.data.filter((item: elderProfile) =>
+          item.name.includes(value),
         );
+        setElderListData(filteredElderList);
+      }
+    } else if (detail === 'majorElder') {
+      if (Array.isArray(intensiveData?.data)) {
+        const filteredIntensiveList = intensiveData.data.filter(
+          (item: intensiceCareProfile) => item.elder.name.includes(value),
+        );
+        setIntensiveListData(filteredIntensiveList);
       }
     }
-    if (detail === 'elder') return elderListDataFiltered[0]?.list;
-    if (detail === 'majorElder') return majorElderListDataFiltered[0]?.list;
-
-    return [];
   };
 
-  const filteredElders = getFilteredElders();
-
-  const renderBody = (data: elderProfile | majorElderProfile) => {
-    const birthdate = extractBirthdate(data.idNumber);
-    let gradeColor = '';
-    if ('grade' in data) {
-      switch (data.grade) {
-        case '관심':
-          gradeColor = 'bg-green-200';
-          break;
-        case '주의':
-          gradeColor = 'bg-yellow-200';
-          break;
-        case '심각':
-          gradeColor = 'bg-red-200';
-          break;
-        default:
-          gradeColor = '';
-          break;
-      }
-    }
-    if ('grade' in data) {
+  const renderBody = (data: elderProfile | intensiceCareProfile) => {
+    if ('elder' in data) {
+      const selectedElderData = data as intensiceCareProfile;
       return (
         <>
           <td>
-            {data.name} / {data.gender}
+            {selectedElderData.elder.name} / {selectedElderData.elder.gender}
           </td>
-          <td>{birthdate}</td>
+          <td>{extractBirthdate(selectedElderData.elder.idNumber)}</td>
           <td>
-            {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
+            {selectedElderData.elder.nation.name}{' '}
+            {selectedElderData.elder.city.name}{' '}
+            {selectedElderData.elder.district.name}{' '}
+            {selectedElderData.elder.detailAddress}
           </td>
-          <td>{data.phone}</td>
-          <td>{data.bloodType}</td>
-          <td>{data.etc}</td>
-          <td className={gradeColor}>{data.grade}</td>
+          <td>{selectedElderData.elder.phone}</td>
+          <td>{selectedElderData.elder.bloodType}</td>
+          <td>{selectedElderData.elder.etc}</td>
+          <td>{selectedElderData.grade ?? ''}</td>
         </>
       );
     }
+    const basicData = data as elderProfile;
     return (
       <>
         <td>
-          {data.name} / {data.gender}
+          {basicData.name} / {basicData.gender}
         </td>
-        <td>{birthdate}</td>
+        <td>{extractBirthdate(basicData.idNumber)}</td>
         <td>
-          {data.nationId} {data.cityId} {data.districtId} {data.detailAddress}
+          {basicData.nationId} {basicData.cityId ?? ''} {basicData.districtId}{' '}
+          {basicData.detailAddress}
         </td>
-        <td>{data.phone}</td>
-        <td>{data.bloodType}</td>
-        <td>{data.etc}</td>
-        <td> </td>
+        <td>{basicData.phone}</td>
+        <td>{basicData.bloodType}</td>
+        <td>{basicData.etc ?? ''}</td>
       </>
     );
   };
 
   return (
-    <div className="flex">
-      <Sidebar
-        sort="Doctor"
-        detail={detail}
-        handleTable={handleManageTable}
-        items={items}
-      />
-      <div className="w-4/5 p-8 mt-12">
-        <div className="flex justify-between">
-          <h1 className="mb-6 text-2xl font-bold">
-            {items.find((data) => data.id === detail)?.text}
-          </h1>
-          <div className="flex justify-end mb-4">
-            {detail && (
-              <input
-                type="text"
-                placeholder="검색"
-                className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-            )}
+    <>
+      {emergencyPopup && emergencyData?.data.length > 0 && (
+        <SupportRequestPopup
+          elderlyInfo={emergencyData?.data[0]}
+          onClose={() => setEmergencyPopup(false)}
+        />
+      )}
+      <div className="flex">
+        <Sidebar
+          sort="Doctor"
+          items={items}
+          detail={detail}
+          handleTable={handleManageTable}
+        />
+        <div className="w-full p-20 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">
+              {detail === 'elder' ? '고령자 관리' : '주요대상 관리'}
+            </h2>
+            <input
+              type="text"
+              placeholder="검색"
+              value={searchQuery}
+              onChange={handleSearchQueryChange}
+              className="px-4 py-2 border border-gray-300 rounded"
+            />
           </div>
+          <table className="table text-center">
+            <thead>
+              <tr>{renderHeader()}</tr>
+            </thead>
+            <tbody>
+              {(detail === 'elder' ? elderListData : intensiveListData)?.map(
+                (elder, index) => (
+                  <BodyRow
+                    key={elder.id}
+                    data={elder}
+                    index={index}
+                    handleAddPopup={handleAddPopup}
+                    handleDeletePopup={handleDeletePopup}
+                    extractBirthdate={extractBirthdate}
+                  />
+                ),
+              )}
+            </tbody>
+          </table>
         </div>
-        <table className="table text-center">
-          <thead>
-            <tr>
-              <th> </th>
-              {renderHeader()}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredElders?.map((data, index) => (
-              <tr className="hover:bg-main-base" key={data.id}>
-                <th>{index + 1}</th>
-                {renderBody(data)}
-                {detail === 'elder' && (
-                  <td>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => handleAddPopup(true, data)}
-                    >
-                      추가
-                    </button>
-                  </td>
-                )}
-                {detail === 'majorElder' && (
-                  <td>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => handleDeletePopup(true, data)}
-                    >
-                      삭제
-                    </button>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {showAddPopup && selectedElder && (
+          <AddPopup
+            handleClose={() => setShowAddPopup(false)}
+            handleAddElder={handleAddElder}
+            selectedElder={selectedElder}
+            reason={reason}
+            setReason={setReason}
+            selectedGrade={selectedGrade}
+            setSelectedGrade={setSelectedGrade}
+            renderHeader={renderHeader}
+            renderBody={renderBody}
+          />
+        )}
+        {showDeletePopup && selectedElder && (
+          <DeletePopup
+            handleClose={() => setShowDeletePopup(false)}
+            handleDeleteElder={handleDeleteElder}
+            selectedElder={selectedElder}
+            reason={reason}
+            setReason={setReason}
+            renderHeader={renderHeader}
+            renderBody={renderBody}
+          />
+        )}
       </div>
-
-      {showAddPopup && selectedElder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-1/2 p-8 space-y-6 bg-white rounded shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">주요대상 추가</h2>
-              <button
-                type="button"
-                className="text-xl font-bold"
-                onClick={() => handleAddPopup(false, null)}
-              >
-                &times;
-              </button>
-            </div>
-            <table className="table text-center">
-              <thead>
-                <tr>{renderHeader()}</tr>
-              </thead>
-              <tbody>
-                <tr className="hover:bg-main-base">
-                  {renderBody(selectedElder)}
-                </tr>
-              </tbody>
-            </table>
-            <select
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-            >
-              <option value="관심">관심</option>
-              <option value="주의">주의</option>
-              <option value="심각">심각</option>
-            </select>
-            <textarea
-              placeholder="추가 사유를 입력해주세요."
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-            <button
-              type="button"
-              className="w-full btn"
-              onClick={handleAddElder}
-            >
-              추가
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showDeletePopup && selectedElder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-1/2 p-8 space-y-6 bg-white rounded shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">주요대상 삭제</h2>
-              <button
-                type="button"
-                className="text-xl font-bold"
-                onClick={() => handleDeletePopup(false, null)}
-              >
-                ×
-              </button>
-            </div>
-
-            <table className="table text-center">
-              <thead>
-                <tr>{renderHeader()}</tr>
-              </thead>
-              <tbody>
-                <tr className="hover:bg-main-base">
-                  {renderBody(selectedElder)}
-                </tr>
-              </tbody>
-            </table>
-            <textarea
-              placeholder="삭제 사유를 입력해주세요."
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-            <button
-              type="button"
-              className="w-full btn"
-              onClick={handleDeleteElder}
-            >
-              삭제
-            </button>
-          </div>
-        </div>
-      )}
-      <Notification />
-    </div>
+    </>
   );
 };
 
