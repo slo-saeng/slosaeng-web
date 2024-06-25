@@ -156,21 +156,26 @@ const DoctorPage = () => {
   const handleSearchQueryChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setSearchQuery(event.target.value);
+    const { value } = event.target;
+    setSearchQuery(value);
 
-    if (detail === 'elder')
-      setElderListData(
-        elderData.filter((item: elderProfile) =>
-          item.name.includes(searchQuery),
-        ),
-      );
-    else if (detail === 'majorElder')
-      setIntensiveListData(
-        intensiveData.filter((item: intensiceCareProfile) =>
-          item.name.includes(searchQuery),
-        ),
-      );
+    if (detail === 'elder') {
+      if (Array.isArray(elderData?.data)) {
+        const filteredElderList = elderData.data.filter((item: elderProfile) =>
+          item.name.includes(value),
+        );
+        setElderListData(filteredElderList);
+      }
+    } else if (detail === 'majorElder') {
+      if (Array.isArray(intensiveData?.data)) {
+        const filteredIntensiveList = intensiveData.data.filter(
+          (item: intensiceCareProfile) => item.elder.name.includes(value),
+        );
+        setIntensiveListData(filteredIntensiveList);
+      }
+    }
   };
+
   const renderBody = (data: elderProfile | intensiceCareProfile) => {
     if ('elder' in data) {
       const selectedElderData = data as intensiceCareProfile;
