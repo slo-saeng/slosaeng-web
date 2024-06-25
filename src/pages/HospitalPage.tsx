@@ -1,71 +1,49 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import addressList from '../mocks/addressList.json';
-
-interface Region {
-  nation: string;
-  city: string;
-  district: string;
-}
-const defaultRegion = {
-  nation: '',
-  city: '',
-  district: '',
-};
+import { FaSearch } from 'react-icons/fa';
+import { useInstitutionByKeyword } from '../hooks/useInstitutionByKeyword';
+import { institutionInfo } from '../types/institution';
+import Input from '../component/common/Input/Input';
+import { useInstitutionPaging } from '../hooks/useInstitutionPaging';
 
 const HospitalPage = () => {
-  const [region, setRegion] = useState<Region>(defaultRegion);
-  const handleRegionChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setRegion((prevInfo) => ({
-      ...prevInfo,
-      [name]: value,
-    }));
+  const [keyword, setKeyword] = useState<string>('');
+  const { data: pagingData } = useInstitutionPaging(0, 20);
+  const [tableData, setTableData] = useState<institutionInfo[]>();
+  const defaultData = pagingData?.data.content;
+  const [searchWord, setSearchWord] = useState<string>('');
+  const { data: institutionKeywordData } = useInstitutionByKeyword(searchWord);
+
+  const handleKeywordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value);
   };
 
+  useEffect(() => {
+    if (keyword === '') setTableData(defaultData);
+    else if (keyword !== '' && institutionKeywordData?.data) {
+      setTableData(institutionKeywordData.data);
+    }
+  }, [institutionKeywordData, keyword]);
+
   return (
-    <div className="h-screen px-40 py-24 space-y-8">
+    <div className="h-full px-40 py-24 space-y-8">
       <h1 className="text-4xl font-bold">주변 의료기관 확인하기 🔎</h1>
       <div className="grid grid-cols-3 gap-2">
-        <select
-          id="nation"
-          name="nation"
-          className="w-full p-2 border rounded-md"
-          value={region.nation}
-          onChange={handleRegionChange}
-        >
-          <option disabled selected>
-            도
-          </option>
-          {addressList.map(({ id, name }) => (
-            <option key={id} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-        <select
-          id="city"
-          name="city"
-          className="w-full p-2 border rounded-md"
-          value={region.city}
-          onChange={handleRegionChange}
-        >
-          <option disabled selected>
-            시
-          </option>
-        </select>
-        <select
-          id="district"
-          name="district"
-          className="w-full p-2 border rounded-md"
-          value={region.district}
-          onChange={handleRegionChange}
-        >
-          <option selected>구</option>
-        </select>
+        <div className="flex items-center space-x-2">
+          <Input
+            placeholder="검색어를 입력해주세요"
+            name="search"
+            onChange={handleKeywordChange}
+          />
+          <FaSearch
+            size={36}
+            onClick={() => setSearchWord(keyword)}
+            className="p-2 rounded-md hover:cursor-pointer hover:bg-gray-200"
+          />
+        </div>
       </div>
       <p>
-        <span className="text-main-point">경기도 수원시 영통구</span> 내
+        <span className="text-main-point">{keyword}</span> 로 검색한
         의료기관입니다.
       </p>
       <div className="overflow-x-auto">
@@ -73,6 +51,7 @@ const HospitalPage = () => {
           <thead>
             <tr>
               <th> </th>
+              <th>📁 분류</th>
               <th>🏥 병원명</th>
               <th>📍 주소</th>
               <th>📞 연락처</th>
@@ -80,39 +59,24 @@ const HospitalPage = () => {
             </tr>
           </thead>
           <tbody>
-            <tr className="hover:bg-main-base">
-              <th>1</th>
-              <td>아주대학교 병원</td>
-              <td>경기 수원시 영통구 월드컵로 164</td>
-              <td>1688-6114</td>
-              <td>
-                <Link to="http://hosp.ajoumc.or.kr/">
-                  http://hosp.ajoumc.or.kr/
-                </Link>
-              </td>
-            </tr>
-            <tr className="hover:bg-main-base">
-              <th>2</th>
-              <td>아주대학교 병원</td>
-              <td>경기 수원시 영통구 월드컵로 164</td>
-              <td>1688-6114</td>
-              <td>
-                <Link to="http://hosp.ajoumc.or.kr/">
-                  http://hosp.ajoumc.or.kr/
-                </Link>
-              </td>
-            </tr>
-            <tr className="hover:bg-main-base">
-              <th>3</th>
-              <td>아주대학교 병원</td>
-              <td>경기 수원시 영통구 월드컵로 164</td>
-              <td>1688-6114</td>
-              <td>
-                <Link to="http://hosp.ajoumc.or.kr/">
-                  http://hosp.ajoumc.or.kr/
-                </Link>
-              </td>
-            </tr>
+            {(keyword === '' ? defaultData : tableData)?.map(
+              (data: institutionInfo, index: number) => (
+                <tr className="hover:bg-main-base" key={data.name}>
+                  <th>{index + 1}</th>
+                  <td>{data.type}</td>
+                  <td className="hover:underline hover:cursor-pointer">
+                    {data.name}
+                  </td>
+                  <td>{data.address}</td>
+                  <td>{data.tel}</td>
+                  <td>
+                    <Link to={data.homepage} className="hover:underline">
+                      {data.homepage}
+                    </Link>
+                  </td>
+                </tr>
+              ),
+            )}
           </tbody>
         </table>
       </div>
