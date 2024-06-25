@@ -11,3 +11,11 @@ export const postEmergency = async ({ info, elderId }: emergencyRequest) => {
   }
   return response.data;
 };
+
+export const getEmergencyId = async () => {
+  const response = await server.get(`/emergency`);
+  if (response.status !== 200) {
+    throw new Error('긴급 도움 요청 목록 조회에 실패했습니다.');
+  }
+  return response.data;
+};
