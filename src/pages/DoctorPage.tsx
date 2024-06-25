@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import type { elderProfile, intensiceCareProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-import { useMember } from '../hooks/useMember';
+// import { useMember } from '../hooks/useMember';
 import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
 import BodyRow from '../component/doctor/elderList/BodyRow';
@@ -17,7 +17,7 @@ const items = [
 ];
 
 const DoctorPage = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
   const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
   const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
@@ -30,7 +30,7 @@ const DoctorPage = () => {
   const { data: elderData } = useElder();
   const { data: intensiveData } = useIntensiveCare();
   const { cancelIntensiveMutate } = useCancelIntensiveMutation();
-  const { data: loginData } = useMember();
+  // const { data: loginData } = useMember();
   const { intensiveCareMutate } = useIntensiveCareMutation();
   const [elderListData, setElderListData] = useState<elderProfile[]>([]);
   const [intensiveListData, setIntensiveListData] = useState<
@@ -48,11 +48,11 @@ const DoctorPage = () => {
     }
   }, [detail, elderData, intensiveData]);
 
-  useEffect(() => {
-    if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
-      navigate('/forbidden');
-    }
-  }, [loginData]);
+  // useEffect(() => {
+  //   if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
+  //     navigate('/forbidden');
+  //   }
+  // }, [loginData]);
 
   const renderHeader = (): JSX.Element | null => {
     switch (detail) {

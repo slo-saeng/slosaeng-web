@@ -1,16 +1,13 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import { postIntensiveCare } from '../api/intensiveCare';
 
 export const useIntensiveCareMutation = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const intensiveCareMutation = useMutation({
     mutationFn: postIntensiveCare,
     onSuccess: (data) => {
       if (data) {
         alert('주요대상으로 등록되었습니다.');
-        navigate('/');
       } else alert('잘못된 정보가 있는지 확인해주세요.');
       queryClient.invalidateQueries({
         queryKey: [`intensiveCare`],
