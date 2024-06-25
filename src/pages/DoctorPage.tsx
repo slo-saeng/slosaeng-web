@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { elderProfile, intensiceCareProfile } from '../types/member';
 import Sidebar from '../component/common/Sidebar/Sidebar';
-// import { useMember } from '../hooks/useMember';
+import { useMember } from '../hooks/useMember';
 import AddPopup from '../component/doctor/popup/AddPopup';
 import DeletePopup from '../component/doctor/popup/DeletePopup';
 import BodyRow from '../component/doctor/elderList/BodyRow';
@@ -10,6 +10,8 @@ import { useIntensiveCareMutation } from '../hooks/useIntensiveCareMutation';
 import { useElder } from '../hooks/useElder';
 import { useIntensiveCare } from '../hooks/useIntensiveCare';
 import { useCancelIntensiveMutation } from '../hooks/useCancelIntensiveMutation';
+import { useEmergency } from '../hooks/useEmergency';
+import SupportRequestPopup from '../component/doctor/emergency/SupportRequestPopup';
 
 const items = [
   { id: 'elder', text: '고령자 관리' },
@@ -17,7 +19,7 @@ const items = [
 ];
 
 const DoctorPage = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<string>('elder');
   const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
   const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
@@ -30,15 +32,20 @@ const DoctorPage = () => {
   const { data: elderData } = useElder();
   const { data: intensiveData } = useIntensiveCare();
   const { cancelIntensiveMutate } = useCancelIntensiveMutation();
-  // const { data: loginData } = useMember();
+  const { data: loginData } = useMember();
   const { intensiveCareMutate } = useIntensiveCareMutation();
   const [elderListData, setElderListData] = useState<elderProfile[]>([]);
   const [intensiveListData, setIntensiveListData] = useState<
     intensiceCareProfile[]
   >([]);
+  const { data: emergencyData } = useEmergency();
+  const [emergencyPopup, setEmergencyPopup] = useState<boolean>(false);
   const handleManageTable = (role: string) => {
     setDetail(role);
   };
+  useEffect(() => {
+    setEmergencyPopup(true);
+  }, [emergencyData]);
 
   useEffect(() => {
     if (detail === 'elder') {
@@ -48,11 +55,11 @@ const DoctorPage = () => {
     }
   }, [detail, elderData, intensiveData]);
 
-  // useEffect(() => {
-  //   if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
-  //     navigate('/forbidden');
-  //   }
-  // }, [loginData]);
+  useEffect(() => {
+    if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
+      navigate('/forbidden');
+    }
+  }, [loginData]);
 
   const renderHeader = (): JSX.Element | null => {
     switch (detail) {
@@ -217,71 +224,79 @@ const DoctorPage = () => {
   };
 
   return (
-    <div className="flex">
-      <Sidebar
-        sort="Doctor"
-        items={items}
-        detail={detail}
-        handleTable={handleManageTable}
-      />
-      <div className="w-full p-20 space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">
-            {detail === 'elder' ? '고령자 관리' : '주요대상 관리'}
-          </h2>
-          <input
-            type="text"
-            placeholder="검색"
-            value={searchQuery}
-            onChange={handleSearchQueryChange}
-            className="px-4 py-2 border border-gray-300 rounded"
-          />
+    <>
+      {emergencyPopup && emergencyData?.data.length > 0 && (
+        <SupportRequestPopup
+          elderlyInfo={emergencyData?.data[0]}
+          onClose={() => setEmergencyPopup(false)}
+        />
+      )}
+      <div className="flex">
+        <Sidebar
+          sort="Doctor"
+          items={items}
+          detail={detail}
+          handleTable={handleManageTable}
+        />
+        <div className="w-full p-20 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">
+              {detail === 'elder' ? '고령자 관리' : '주요대상 관리'}
+            </h2>
+            <input
+              type="text"
+              placeholder="검색"
+              value={searchQuery}
+              onChange={handleSearchQueryChange}
+              className="px-4 py-2 border border-gray-300 rounded"
+            />
+          </div>
+          <table className="table text-center">
+            <thead>
+              <tr>{renderHeader()}</tr>
+            </thead>
+            <tbody>
+              {(detail === 'elder' ? elderListData : intensiveListData)?.map(
+                (elder, index) => (
+                  <BodyRow
+                    key={elder.id}
+                    data={elder}
+                    index={index}
+                    handleAddPopup={handleAddPopup}
+                    handleDeletePopup={handleDeletePopup}
+                    extractBirthdate={extractBirthdate}
+                  />
+                ),
+              )}
+            </tbody>
+          </table>
         </div>
-        <table className="table text-center">
-          <thead>
-            <tr>{renderHeader()}</tr>
-          </thead>
-          <tbody>
-            {(detail === 'elder' ? elderListData : intensiveListData)?.map(
-              (elder, index) => (
-                <BodyRow
-                  key={elder.id}
-                  data={elder}
-                  index={index}
-                  handleAddPopup={handleAddPopup}
-                  handleDeletePopup={handleDeletePopup}
-                  extractBirthdate={extractBirthdate}
-                />
-              ),
-            )}
-          </tbody>
-        </table>
+        {showAddPopup && selectedElder && (
+          <AddPopup
+            handleClose={() => setShowAddPopup(false)}
+            handleAddElder={handleAddElder}
+            selectedElder={selectedElder}
+            reason={reason}
+            setReason={setReason}
+            selectedGrade={selectedGrade}
+            setSelectedGrade={setSelectedGrade}
+            renderHeader={renderHeader}
+            renderBody={renderBody}
+          />
+        )}
+        {showDeletePopup && selectedElder && (
+          <DeletePopup
+            handleClose={() => setShowDeletePopup(false)}
+            handleDeleteElder={handleDeleteElder}
+            selectedElder={selectedElder}
+            reason={reason}
+            setReason={setReason}
+            renderHeader={renderHeader}
+            renderBody={renderBody}
+          />
+        )}
       </div>
-      {showAddPopup && selectedElder && (
-        <AddPopup
-          handleClose={() => setShowAddPopup(false)}
-          handleAddElder={handleAddElder}
-          selectedElder={selectedElder}
-          reason={reason}
-          setReason={setReason}
-          selectedGrade={selectedGrade}
-          setSelectedGrade={setSelectedGrade}
-          renderHeader={renderHeader}
-          renderBody={renderBody}
-        />
-      )}
-      {showDeletePopup && selectedElder && (
-        <DeletePopup
-          handleClose={() => setShowDeletePopup(false)}
-          handleDeleteElder={handleDeleteElder}
-          selectedElder={selectedElder}
-          reason={reason}
-          setReason={setReason}
-          renderHeader={renderHeader}
-          renderBody={renderBody}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

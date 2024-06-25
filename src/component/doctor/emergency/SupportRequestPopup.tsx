@@ -12,11 +12,13 @@ const SupportRequestPopup: React.FC<ElderlyData> = ({
 }: ElderlyData) => {
   const { cancelEmergencyMutate } = useCancelEmergencyMutation();
   const handleAccept = () => {
+    cancelEmergencyMutate(elderlyInfo.id);
     alert('긴급 도움 요청을 수락하셨습니다.');
     onClose();
   };
   const handleReject = () => {
     cancelEmergencyMutate(elderlyInfo.id);
+    alert('긴급 도움 요청을 거절하셨습니다.');
     onClose();
   };
   return (
