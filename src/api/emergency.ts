@@ -27,3 +27,11 @@ export const getEmergencyId = async (elderId: number) => {
   }
   return response.data;
 };
+
+export const deleteEmegenct = async (elderId: number) => {
+  const response = await server.delete(`/intensive-care/${elderId}`);
+  if (response.status !== 200) {
+    throw new Error('긴급 도움 요청을 삭제하지 못했습니다.');
+  }
+  return response.data;
+};
