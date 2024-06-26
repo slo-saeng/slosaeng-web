@@ -30,7 +30,9 @@ module.exports = {
     },
   },
   rules: {
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'react/react-in-jsx-scope': 'off',
+    'import/no-extraneous-dependencies': 0,
     'react/function-component-definition': [
       2,
       {
@@ -38,5 +40,8 @@ module.exports = {
         unnamedComponents: 'arrow-function',
       },
     ],
+    'react/require-default-props': 'warn',
+    'import/no-cycle': 'off',
+    'import/prefer-default-export': 'off',
   },
 };
