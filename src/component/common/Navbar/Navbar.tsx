@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { CiLogout } from 'react-icons/ci';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [logout, setLogout] = useState<boolean>(
     Boolean(localStorage.getItem('refreshToken')),
   );
@@ -18,8 +20,10 @@ const Navbar = () => {
   }, [setLogout]);
 
   return (
-    <nav className="fixed top-0 left-0 z-10 flex justify-between w-full px-12 py-3 bg-white border-b text-main-point">
-      <p className="text-lg font-bold">슬로생 Slo-saeng</p>
+    <nav className="fixed top-0 left-0 z-10 flex justify-between w-full px-20 py-3 bg-white border-b text-main-point">
+      <button onClick={() => navigate('/')} type="button">
+        <img src="slosaengLogo.png" alt="로고" className="h-12" />
+      </button>
       {logout && (
         <CiLogout
           size="32"

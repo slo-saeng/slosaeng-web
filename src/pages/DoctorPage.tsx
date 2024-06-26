@@ -56,7 +56,10 @@ const DoctorPage = () => {
   }, [detail, elderData, intensiveData]);
 
   useEffect(() => {
-    if (!loginData?.data && loginData?.data.role !== 'DOCTOR') {
+    if (
+      !loginData?.data &&
+      (loginData?.data.role !== 'DOCTOR' || loginData?.data.role === 'SUPER')
+    ) {
       navigate('/forbidden');
     }
   }, [loginData]);

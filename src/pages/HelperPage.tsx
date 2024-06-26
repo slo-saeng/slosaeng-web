@@ -15,7 +15,10 @@ const HelperPage = () => {
   const { cancelElderMutate } = useCancelElderMutation();
 
   useEffect(() => {
-    if (!loginData?.data && loginData?.data.role !== 'HELPER') {
+    if (
+      !loginData?.data &&
+      (loginData?.data.role !== 'HELPER' || loginData?.data.role === 'SUPER')
+    ) {
       navigate('/forbidden');
     }
   }, [loginData]);
@@ -35,7 +38,7 @@ const HelperPage = () => {
         handleTable={handleManageTable}
         items={items}
       />
-      <div className="w-4/5 p-8 mt-12">
+      <div className="w-4/5 p-8 mt-16">
         <h1 className="mb-6 text-2xl font-bold">
           {items.find((data) => data.id === detail)?.text}
         </h1>

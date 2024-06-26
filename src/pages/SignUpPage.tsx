@@ -23,11 +23,11 @@ const SignUpPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="py-40">
-        <p className="flex items-center w-2/3 px-32 text-5xl font-bold justify-left">
+      <div className="py-40 space-y-2">
+        <p className="flex items-center text-5xl font-bold px-44 justify-left">
           회원가입
         </p>
-        <div className="grid grid-cols-3 gap-10 transition-all duration-500 transform scale-75 translate-x-0'">
+        <div className="grid grid-cols-3 gap-4 px-44">
           <ButtonCardWithClick
             icon={<FaHospital size="64" color="white" />}
             text="병원"
