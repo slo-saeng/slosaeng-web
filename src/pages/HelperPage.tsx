@@ -15,7 +15,10 @@ const HelperPage = () => {
   const { cancelElderMutate } = useCancelElderMutation();
 
   useEffect(() => {
-    if (!loginData?.data && loginData?.data.role !== 'HELPER') {
+    if (
+      !loginData?.data &&
+      (loginData?.data.role !== 'HELPER' || loginData?.data.role === 'SUPER')
+    ) {
       navigate('/forbidden');
     }
   }, [loginData]);

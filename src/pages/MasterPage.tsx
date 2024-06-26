@@ -44,7 +44,10 @@ const MasterPage = () => {
   };
 
   useEffect(() => {
-    if (!loginData?.data && loginData?.data.role !== 'MASTER') {
+    if (
+      !loginData?.data &&
+      (loginData?.data.role !== 'MASTER' || loginData?.data.role === 'SUPER')
+    ) {
       navigate('/forbidden');
     }
   }, [loginData]);
