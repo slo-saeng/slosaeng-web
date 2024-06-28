@@ -2,7 +2,10 @@ import { useState, ChangeEvent } from 'react';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import { useMember } from '../../../hooks/useMember';
-import { elderProfile } from '../../../types/member';
+import type {
+  elderProfile,
+  intensiceDetailrofile,
+} from '../../../types/member';
 import { useEmergencyMutation } from '../../../hooks/useEmergencyMutation';
 
 interface HelpModalProps {
@@ -11,7 +14,11 @@ interface HelpModalProps {
 
 const HelpModal = ({ closeModal }: HelpModalProps) => {
   const { data } = useMember();
-  const [elder, setElder] = useState<number>(data?.data.elders[0].id);
+  const elders = data?.data.elders || [];
+  const [elder, setElder] = useState<number>(
+    elders.length > 0 ? elders[0].id : '',
+  );
+  const [elderInfo, setElderInfo] = useState<intensiceDetailrofile>(elders[0]);
   const [info, setInfo] = useState<string>('');
   const [request, setRequest] = useState<boolean>(false);
   const { emergencyMutate } = useEmergencyMutation();
@@ -27,6 +34,9 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
         {
           onSuccess: () => {
             setRequest(true);
+            setElderInfo(
+              elders.find((e: intensiceDetailrofile) => e.id === elder),
+            );
           },
           onError: () => {
             setRequest(false);
@@ -42,12 +52,10 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
         {request ? (
           <div className="flex flex-col space-y-8">
             <p className="text-center break-words whitespace-normal">
-              <span className="font-bold underline">
-                {data?.data.elders[elder - 1].name}
-              </span>
+              <span className="font-bold underline">{elderInfo.name}</span>
               님에 대한 긴급 도움 요청을 완료하였습니다. <br />
-              거주 중인 {data?.data.elders[elder - 1].district.name} 내 병원으로
-              요청되었습니다. <br />
+              거주 중인 {elderInfo.district.name} 내 병원으로 요청되었습니다.{' '}
+              <br />
               수락한 병원 측에서 연락드릴 예정입니다.
             </p>
             <Button text="닫기" onClick={closeModal} />
@@ -60,7 +68,7 @@ const HelpModal = ({ closeModal }: HelpModalProps) => {
               onChange={(e) => setElder(parseInt(e.target.value, 10))}
             >
               <option disabled>고령자를 선택해주세요</option>
-              {data?.data.elders.map(({ id, name }: elderProfile) => {
+              {elders.map(({ id, name }: elderProfile) => {
                 return (
                   <option key={id} value={id}>
                     {name}
